@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vartistic Studio | Creative Web Development Agency</title>
+    <meta name="description" content="Vartistic Studio specializes in custom web development, responsive design, and SEO strategies to help your business grow online.">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+</head>
+<body>
+    <div class="preloader"><div class="loader-text">VARTISTIC</div><div class="loader-bar"><div class="loader-progress"></div></div></div>
+    
+    <nav class="navbar">
+        <div class="logo">Vartistic<span>.</span></div>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="work.html">Our Work</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="team.html">The Squad</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button class="theme-btn"><span>☀️</span> Mode</button>
+            <div class="hamburger"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="drag-object"><span class="drag-instruction">Drag Me</span></div>
+        <div class="hero-content">
+            <h1>Crafting Digital <br><span style="color:var(--accent);">Experiences.</span></h1>
+            <p>We are Vartistic Studio. A team of developers and strategists dedicated to building responsive, high-performance websites that help your business rank and convert.</p>
+            <div style="display: flex; gap: 15px;">
+                <a href="services.html" style="padding: 12px 30px; border: 1px solid var(--text-main); color: var(--text-main); text-decoration: none; border-radius: 5px;">Explore Services</a>
+            </div>
+        </div>
+        <div class="hero-form-container">
+            <form class="hero-form">
+                <h3>Quick Enquiry</h3>
+                <div class="form-group"><input type="text" placeholder="Your Name" required></div>
+                <div class="form-group"><input type="email" placeholder="Your Email" required></div>
+                <div class="form-group">
+                    <select>
+                        <option>Service Needed?</option>
+                        <option>New Website</option>
+                        <option>Redesign</option>
+                        <option>Maintenance</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">Book A Call</button>
+            </form>
+        </div>
+    </header>
+
+    <section id="services">
+        <h2 class="section-title">How We Help You Grow</h2>
+        <div class="work-grid">
+            <div class="work-card" style="padding: 30px;">
+                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Custom Development</h3>
+                <p>We don't rely on generic templates. We write clean, semantic code that Google loves, ensuring your site is fast and secure.</p>
+            </div>
+            <div class="work-card" style="padding: 30px;">
+                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">SEO Optimization</h3>
+                <p>Ranking on page 1 isn't luck. We use keyword research, schema markup, and technical SEO to improve your visibility.</p>
+            </div>
+            <div class="work-card" style="padding: 30px;">
+                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Responsive Design</h3>
+                <p>Your site will look perfect on every device—from large desktop monitors to the smallest smartphones.</p>
+            </div>
+        </div>
+    </section>
+
+    <button class="back-to-top">↑</button>
+
+    <footer>
+        <p>&copy; 2025 Vartistic Studio. Empowering Businesses Online.</p>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="work.html">Work</a>
+            <a href="services.html">Services</a>
+            <a href="team.html">Team</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
