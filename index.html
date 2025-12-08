@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vartistic Studio | Custom Web Design & SEO Agency</title>
+    <meta name="description" content="Vartistic Studio builds fast, SEO-first websites with modern UX, Core Web Vitals wins, and conversion-focused content for brands that want to rank and convert.">
+    <meta name="keywords" content="web development agency, technical SEO, core web vitals, page speed optimization, ui ux design, ecommerce development, custom websites, seo agency">
+    <meta property="og:title" content="Vartistic Studio | Custom Web Design & SEO Agency">
+    <meta property="og:description" content="Custom web development, UX/UI design, and technical SEO to outrank competitors.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.vartisticstudio.com/">
+    <meta name="twitter:card" content="summary_large_image">
     
     <!-- CSS: Locomotive Scroll & Your Custom CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.css">
@@ -49,10 +56,12 @@
         <header class="hero" id="home" data-scroll-section>
             <div class="hero-bg"></div> 
             
-            <!-- Draggable Object with Parallax -->
-            <div class="drag-object" data-scroll data-scroll-speed="2">
+            <!-- Draggable Objects with Parallax -->
+            <div class="drag-object" data-scroll data-scroll-speed="2" style="top: 55%; left: 42%;">
                 <span class="drag-instruction">Drag Me</span>
             </div>
+           
+            <div class="drag-object mobile-orb" style="top: 18%; left: 8%; opacity: 0.75;" aria-hidden="true"></div>
 
             <div class="hero-content" data-scroll data-scroll-speed="1">
                 <h1>We Engineer <br><span class="text-gradient">Digital Dominance.</span></h1>
@@ -141,6 +150,74 @@
             </div>
         </section>
 
+        <!-- SEO-FIRST ABOUT SECTION -->
+        <section data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.6">Built to <span class="highlight">Rank</span> and Convert</h2>
+            <div class="about-grid">
+                <div class="about-card" data-scroll data-scroll-speed="0.9">
+                    <h3>Technical SEO Foundation</h3>
+                    <p>Schema, Core Web Vitals tuning, lazy-loading, image compression, and semantic HTML to improve crawlability and Lighthouse scores.</p>
+                    <div class="pill-row">
+                        <span class="pill">Core Web Vitals</span><span class="pill">Schema Markup</span><span class="pill">Page Speed</span>
+                    </div>
+                </div>
+                <div class="about-card" data-scroll data-scroll-speed="0.7">
+                    <h3>Conversion-Ready UX</h3>
+                    <p>Clear CTAs, frictionless forms, scroll-triggered animations, and trust signals designed to turn visitors into booked calls.</p>
+                    <div class="pill-row">
+                        <span class="pill">UX Copy</span><span class="pill">CTA Strategy</span><span class="pill">A/B Ready</span>
+                    </div>
+                </div>
+                <div class="about-card" data-scroll data-scroll-speed="0.5">
+                    <h3>Content Depth</h3>
+                    <p>Service pages mapped to high-intent keywords, FAQs for snippet eligibility, and on-page SEO best practices for long-tail wins.</p>
+                    <div class="pill-row">
+                        <span class="pill">Keyword Mapping</span><span class="pill">Topic Clusters</span><span class="pill">Snippets</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROCESS SECTION -->
+        <section data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.6">Our SEO + Dev Process</h2>
+            <div class="process-grid">
+                <div class="process-card" data-scroll data-scroll-speed="0.9">
+                    <h4>01 / Research</h4>
+                    <p>Competitive SERP scan, keyword intent mapping, and technical audit to set a measurable baseline.</p>
+                </div>
+                <div class="process-card" data-scroll data-scroll-speed="0.8">
+                    <h4>02 / Build & Optimize</h4>
+                    <p>Ship fast pages with clean code, structured data, caching, and accessibility baked in.</p>
+                </div>
+                <div class="process-card" data-scroll data-scroll-speed="0.7">
+                    <h4>03 / Launch & Iterate</h4>
+                    <p>Monitor rankings, heatmaps, and conversions—then iterate on copy, UX, and internal links.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ SECTION -->
+        <section data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.6">SEO & Performance FAQs</h2>
+            <div class="faq-container">
+                <div class="faq-item" data-scroll data-scroll-speed="0.9">
+                    <div class="faq-question">How do you improve rankings without ads? <span>+</span></div>
+                    <div class="faq-answer">We combine technical SEO (schema, site speed, crawl health), search-intent content, and conversion-focused UX. That mix increases relevancy and engagement signals Google rewards.</div>
+                </div>
+                <div class="faq-item" data-scroll data-scroll-speed="0.7">
+                    <div class="faq-question">Will my site pass Core Web Vitals? <span>+</span></div>
+                    <div class="faq-answer">We optimize Largest Contentful Paint, CLS, and TBT with image compression, lazy-load, preconnects, and minimal render-blocking assets, then validate in PageSpeed Insights.</div>
+                </div>
+                <div class="faq-item" data-scroll data-scroll-speed="0.5">
+                    <div class="faq-question">What content do you create? <span>+</span></div>
+                    <div class="faq-answer">Service pages with high-intent keywords, FAQs for snippet eligibility, case studies for trust, and landing pages aligned to your offers and locations.</div>
+                </div>
+            </div>
+        </section>
+
+        <button class="back-to-top">↑</button>
+
         <!-- CTA BANNER -->
         <section class="cta-banner" data-scroll-section>
             <div data-scroll data-scroll-speed="1">
@@ -178,6 +255,20 @@
     </div> <!-- End Main Container -->
 
     <!-- SCRIPTS -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Vartistic Studio",
+      "url": "https://www.vartisticstudio.com/",
+      "description": "Custom web development and SEO agency delivering Core Web Vitals, UX, and ranking-focused builds.",
+      "sameAs": ["https://www.linkedin.com","https://www.instagram.com","https://twitter.com"],
+      "brand": {
+        "@type": "Brand",
+        "name": "Vartistic Studio"
+      }
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="script.js"></script>
 </body>
