@@ -28,14 +28,19 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+
+/* --- LOCOMOTIVE SCROLL REQUIRED STYLES --- */
+html.has-scroll-smooth { overflow: hidden; }
+html.has-scroll-dragging { user-select: none; }
+.has-scroll-smooth body { overflow: hidden; }
+[data-scroll-container] { min-height: 100vh; }
 
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
     font-family: var(--font-body);
     line-height: 1.6;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Standard overflow */
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -48,7 +53,7 @@ body {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #000; z-index: 10000;
     display: flex; justify-content: center; align-items: center; flex-direction: column;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease, visibility 0.5s;
 }
 .loader-text { font-family: var(--font-head); font-size: 2rem; color: var(--accent); animation: pulse 1.5s infinite; }
 .loader-bar { width: 200px; height: 2px; background: #333; margin-top: 20px; position: relative; overflow: hidden; }
@@ -86,7 +91,7 @@ body {
 .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
 .bar { width: 25px; height: 3px; background-color: var(--text-main); transition: 0.3s; }
 
-/* BACK TO TOP BUTTON */
+/* BACK TO TOP BUTTON (Existing) */
 .back-to-top {
     position: fixed; bottom: 30px; right: 30px;
     width: 50px; height: 50px; background: var(--accent);
@@ -99,20 +104,35 @@ body {
 
 /* SECTIONS COMMON */
 section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid var(--line); }
-.section-title { font-family: var(--font-head); font-size: 2.5rem; margin-bottom: 50px; text-align: center; }
+/* Use Clamp for Responsive Font Size on Titles */
+.section-title { 
+    font-family: var(--font-head); 
+    font-size: clamp(2rem, 4vw, 3.5rem); 
+    margin-bottom: 50px; text-align: center; 
+}
 .highlight { color: var(--accent); }
 
 /* =========================================
-   3. HOME PAGE STYLES
+   3. HOME PAGE STYLES (UPDATED)
    ========================================= */
 .hero {
-    min-height: 100vh; padding: 120px 5% 50px;
+    min-height: 100vh; padding: 150px 5% 50px; /* Increased top padding for fixed nav */
     display: flex; align-items: center; justify-content: space-between;
     position: relative; overflow: hidden;
 }
 .hero-content { width: 50%; z-index: 2; }
-.hero h1 { font-family: var(--font-head); font-size: 4rem; line-height: 1.1; margin-bottom: 20px; }
-.hero p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px; max-width: 500px; }
+
+/* FLUID TYPOGRAPHY: Scale from 2.5rem (mobile) to 5rem (desktop) */
+.hero h1 { 
+    font-family: var(--font-head); 
+    font-size: clamp(2.5rem, 5vw, 5rem); 
+    line-height: 1.1; margin-bottom: 20px; 
+}
+.hero p { 
+    color: var(--text-muted); 
+    font-size: clamp(1rem, 1.2vw, 1.1rem); 
+    margin-bottom: 30px; max-width: 500px; 
+}
 
 .hero-form-container {
     width: 40%; background: var(--bg-card); padding: 40px;
@@ -141,7 +161,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .drag-instruction { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: var(--text-muted); width: 200px; text-align: center; }
 
 /* =========================================
-   4. SERVICES PAGE STYLES
+   4. SERVICES PAGE STYLES (PRESERVED)
    ========================================= */
 .service-list { display: grid; gap: 0; }
 .service-item {
@@ -164,7 +184,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .faq-item.active .faq-answer { max-height: 300px; padding-bottom: 30px; }
 
 /* =========================================
-   5. WORK PAGE STYLES
+   5. WORK PAGE STYLES (PRESERVED)
    ========================================= */
 .work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
 .work-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
@@ -177,7 +197,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .review-author { display: block; margin-top: 10px; color: var(--accent); font-weight: bold; font-style: normal;}
 
 /* =========================================
-   6. TEAM PAGE STYLES
+   6. TEAM PAGE STYLES (PRESERVED)
    ========================================= */
 .team-header { padding-top: 150px; text-align: center; }
 .team-header h1 { font-size: 4rem; margin-bottom: 20px; }
@@ -204,7 +224,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .join-team { text-align: center; padding: 100px 0; background: var(--bg-card); }
 
 /* =========================================
-   7. CONTACT PAGE & FOOTER
+   7. CONTACT PAGE & FOOTER (PRESERVED)
    ========================================= */
 .process-steps { display: flex; justify-content: space-around; margin-top: 50px; flex-wrap: wrap; gap: 30px; }
 .step { text-align: center; max-width: 250px; }
@@ -216,32 +236,192 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 .footer-links a:hover { color: var(--accent); }
 
 /* =========================================
-   8. RESPONSIVE
+   9. NEW CREATIVE ADDITIONS
    ========================================= */
+
+/* Hero Grid Background */
+.hero-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.3;
+    z-index: 1;
+    pointer-events: none;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+/* Text Gradient Utility */
+.text-gradient {
+    background: linear-gradient(90deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+[data-theme="light"] .text-gradient {
+    background: linear-gradient(90deg, #333, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Button Styles */
+.cta-btn {
+    padding: 12px 30px; border-radius: 5px; text-decoration: none;
+    font-weight: 600; transition: all 0.3s;
+}
+.cta-btn.primary {
+    background: var(--accent); color: #000; border: 1px solid var(--accent);
+}
+.cta-btn.primary:hover {
+    background: transparent; color: var(--accent);
+}
+.cta-btn.secondary {
+    border: 1px solid var(--text-main); color: var(--text-main);
+}
+.cta-btn.secondary:hover {
+    background: var(--text-main); color: var(--bg-main);
+}
+
+/* Infinite Marquee Section */
+.marquee-section {
+    background: var(--accent);
+    color: #000;
+    padding: 15px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    z-index: 2;
+    transform: rotate(-1deg);
+    margin: -30px 0 50px 0;
+}
+.marquee-content {
+    display: inline-block;
+    animation: scroll 20s linear infinite;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* NEW: Lottie Box for Animations */
+.lottie-box {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-start;
+}
+.icon-box {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+/* Stats Section */
+.stats-section {
+    padding: 80px 5%;
+    border-bottom: 1px solid var(--line);
+}
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 30px;
+    text-align: center;
+}
+.stat-number {
+    display: block;
+    font-family: var(--font-head);
+    font-size: clamp(2.5rem, 4vw, 3.5rem); /* Clamped for mobile */
+    font-weight: 800;
+    color: var(--accent);
+}
+.stat-label {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* CTA Banner */
+.cta-banner {
+    text-align: center;
+    padding: 100px 5%;
+    background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1), transparent);
+}
+.cta-banner h2 {
+    font-family: var(--font-head);
+    font-size: clamp(2rem, 3vw, 2.5rem);
+    margin-bottom: 10px;
+}
+
+/* Enhanced Footer */
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+.footer-socials a {
+    color: var(--text-muted);
+    margin-left: 15px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.footer-socials a:hover { color: var(--accent); }
+
+/* =========================================
+   8. RESPONSIVE & MOBILE (Enhanced)
+   ========================================= */
+
 @media (max-width: 900px) {
-    .hero { flex-direction: column; text-align: center; padding-top: 100px; }
-    .hero-content { width: 100%; margin-bottom: 50px; }
+    .hero { flex-direction: column; text-align: center; padding-top: 150px; }
+    .hero-content { width: 100%; margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
     .hero-form-container { width: 100%; max-width: 500px; }
-    .hero h1, .team-header h1 { font-size: 2.5rem; }
     
-    .hamburger { display: flex; }
+    .marquee-section { transform: rotate(0deg); margin: 0 0 30px 0; }
+    .stats-container { flex-direction: column; gap: 50px; }
+    
+    /* Navbar Mobile Logic */
+    .hamburger { display: flex; z-index: 1002; }
     .nav-links {
-        position: fixed; top: 70px; left: -100%; width: 100%; height: calc(100vh - 70px);
-        background: var(--bg-main); flex-direction: column; align-items: center;
-        justify-content: center; transition: 0.4s;
+        position: fixed; top: 0; right: -100%; 
+        width: 100%; height: 100vh;
+        background: var(--bg-card); 
+        flex-direction: column; 
+        align-items: center;
+        justify-content: center; 
+        transition: 0.4s ease-in-out;
+        z-index: 1001;
     }
-    .nav-links.active { left: 0; }
+    .nav-links.active { right: 0; }
+
+    /* Footer Mobile */
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-socials a { margin: 0 10px; }
 
     /* Team Mobile */
     .team-list-section { padding: 0 5% 50px; }
     .team-item {
-        flex-direction: column; align-items: flex-start; padding: 0;
+        flex-direction: column; align-items: flex-start; padding: 20px;
         border: 1px solid var(--line); border-radius: 15px; overflow: hidden;
         background: var(--bg-card); margin-bottom: 30px;
     }
-    .team-item:hover { padding: 0; }
+    .team-item:hover { padding: 20px; }
     .team-index { display: none; }
-    .team-name { margin: 20px; font-size: 1.8rem; }
-    .team-role { margin: 0 20px 20px; }
+    .team-name { margin: 10px 0; font-size: 1.8rem; }
+    .team-role { margin: 0 0 20px; }
     .cursor-img-container { display: none !important; }
+}
+
+@media (max-width: 480px) {
+    /* Small Phone Tweaks */
+    .hero-form-container { width: 100%; padding: 20px; }
+    .cta-btn { width: 100%; display: block; margin-bottom: 10px; text-align: center;}
+    .work-grid { grid-template-columns: 1fr; } /* Force 1 column on small phones */
+    .work-card { padding: 20px; }
 }
