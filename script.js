@@ -1,19 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 1. PRELOADER
-    const preloader = document.querySelector('.preloader');
-    const progress = document.querySelector('.loader-progress');
-    if(preloader && progress) {
-        setTimeout(() => { progress.style.width = "100%"; }, 500);
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                setTimeout(() => { preloader.style.display = 'none'; }, 500);
-            }, 1000);
+    // ========================================================
+    // 0. INITIALIZE LOCOMOTIVE SCROLL (The "Smooth" Part)
+    // ========================================================
+    const scrollContainer = document.querySelector('[data-scroll-container]');
+    let locoScroll = null;
+
+    if (scrollContainer) {
+        locoScroll = new LocomotiveScroll({
+            el: scrollContainer,
+            smooth: true,
+            multiplier: 1, // Scroll speed (1 is default)
+            tablet: { smooth: true }, // Smooth on tablets
+            smartphone: { smooth: true } // Smooth on phones
         });
     }
 
-    // 2. THEME TOGGLE
+    // ========================================================
+    // 1. PRELOADER (Enhanced Logic)
+    // ========================================================
+    const preloader = document.querySelector('.preloader');
+    const progress = document.querySelector('.loader-progress');
+
+    if(preloader && progress) {
+        // Simulate loading bar
+        setTimeout(() => { progress.style.width = "50%"; }, 200);
+        setTimeout(() => { progress.style.width = "100%"; }, 800);
+
+        // Hide preloader
+        setTimeout(() => {
+            preloader.style.opacity = '0';
+            setTimeout(() => { 
+                preloader.style.display = 'none'; 
+                // CRITICAL: Update Locomotive Scroll once DOM is fully visible
+                if(locoScroll) locoScroll.update(); 
+            }, 500);
+        }, 1500);
+    }
+
+    // ========================================================
+    // 2. THEME TOGGLE (Preserved)
+    // ========================================================
     const themeBtn = document.querySelector('.theme-btn');
     const icon = themeBtn ? themeBtn.querySelector('span') : null;
     const savedTheme = localStorage.getItem('theme');
@@ -38,32 +65,81 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. MOBILE MENU
+    // ========================================================
+    // 3. MOBILE MENU (Integrated with Smooth Scroll)
+    // ========================================================
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
+    const links = document.querySelectorAll('.nav-links li');
+
     if(hamburger && navLinks) {
+        // Toggle Menu
         hamburger.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             hamburger.classList.toggle('active');
         });
+
+        // Close menu & Smooth Scroll to section on click
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+
+                // Get target href (e.g., #services)
+                const anchor = link.querySelector('a');
+                const targetId = anchor ? anchor.getAttribute('href') : null;
+
+                // If it's a hash link on the same page
+                if(targetId && targetId.startsWith('#') && locoScroll) {
+                    e.preventDefault();
+                    const targetEl = document.querySelector(targetId);
+                    if(targetEl) {
+                        locoScroll.scrollTo(targetEl);
+                    }
+                }
+            });
+        });
     }
 
-    // 4. BACK TO TOP BUTTON
+    // ========================================================
+    // 4. BACK TO TOP BUTTON (Locomotive Compatible)
+    // ========================================================
     const backToTopBtn = document.querySelector('.back-to-top');
+    
     if(backToTopBtn) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                backToTopBtn.style.display = 'flex';
-            } else {
-                backToTopBtn.style.display = 'none';
-            }
-        });
-        backToTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        if(locoScroll) {
+            // Locomotive Scroll Listener
+            locoScroll.on('scroll', (args) => {
+                if (args.scroll.y > 300) {
+                    backToTopBtn.style.display = 'flex';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                locoScroll.scrollTo(0); // Scroll to top
+            });
+        } else {
+            // Fallback for pages without Locomotive
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.style.display = 'flex';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+            });
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
     }
 
-    // 5. GSAP SCROLL REVEAL (Run on all pages)
+    // ========================================================
+    // 5. GSAP SCROLL REVEAL (Legacy Support)
+    // ========================================================
+    // Note: Locomotive handles 'data-scroll' animations automatically, 
+    // but we keep this for elements without data-scroll attributes.
     if(typeof IntersectionObserver !== 'undefined') {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -74,16 +150,22 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        document.querySelectorAll('.work-card, .section-title, .step, .service-item, .team-item').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease-out';
-            observer.observe(el);
+        // Select elements ONLY if they don't have data-scroll (to avoid conflict)
+        document.querySelectorAll('.step, .service-item, .team-item').forEach(el => {
+            if(!el.hasAttribute('data-scroll')) {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
+            }
         });
     }
 
+    // ========================================================
     // 6. HOME PAGE: DRAGGABLE OBJECT
-    if (document.querySelector('.drag-object')) {
+    // ========================================================
+    // We strictly limit this to Desktop (>1024px) to avoid messing up mobile scrolling
+    if (document.querySelector('.drag-object') && window.innerWidth > 1024) {
         gsap.registerPlugin(Draggable);
         Draggable.create(".drag-object", {
             type: "x,y",
@@ -101,17 +183,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 7. SERVICES PAGE: FAQ ACCORDION
+    // ========================================================
+    // 7. SERVICES PAGE: FAQ ACCORDION (Preserved)
+    // ========================================================
     const faqs = document.querySelectorAll('.faq-item');
     if(faqs.length > 0) {
         faqs.forEach(faq => {
             faq.addEventListener('click', () => {
                 faq.classList.toggle('active');
+                // Update locomotive scroll layout when accordion expands
+                setTimeout(() => { if(locoScroll) locoScroll.update(); }, 500);
             });
         });
     }
 
-    // 8. TEAM PAGE: CINEMATIC HOVER
+    // ========================================================
+    // 8. TEAM PAGE: CINEMATIC HOVER (Preserved)
+    // ========================================================
     const teamItems = document.querySelectorAll('.team-item');
     const cursorImgContainer = document.querySelector('.cursor-img-container');
     const cursorImg = document.querySelector('.cursor-img');
@@ -122,35 +210,61 @@ document.addEventListener("DOMContentLoaded", () => {
             teamItems.forEach(item => {
                 item.addEventListener('mouseenter', () => {
                     const imgUrl = item.getAttribute('data-img');
-                    if(cursorImg) cursorImg.src = imgUrl;
+                    if(cursorImg && imgUrl) cursorImg.src = imgUrl;
                     
-                    gsap.to(cursorImgContainer, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" });
+                    if(cursorImgContainer) {
+                        gsap.to(cursorImgContainer, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" });
+                    }
                     
                     // Dim others
                     teamItems.forEach(other => { if(other !== item) other.style.opacity = '0.3'; });
                 });
 
                 item.addEventListener('mouseleave', () => {
-                    gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
+                    if(cursorImgContainer) {
+                        gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
+                    }
                     // Reset opacity
                     teamItems.forEach(other => { other.style.opacity = '1'; });
                 });
 
                 item.addEventListener('mousemove', (e) => {
-                    gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: "power3.out" });
+                    if(cursorImgContainer) {
+                        gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: "power3.out" });
+                    }
                 });
             });
         } else {
             // Mobile Card Injection
             teamItems.forEach(item => {
-                const imgUrl = item.getAttribute('data-img');
-                const img = document.createElement('img');
-                img.src = imgUrl;
-                img.style.width = '100%';
-                img.style.height = '250px';
-                img.style.objectFit = 'cover';
-                item.insertBefore(img, item.firstChild);
+                // Check if image already exists to prevent duplicate injection on resize
+                if(!item.querySelector('.mobile-team-img')) {
+                    const imgUrl = item.getAttribute('data-img');
+                    if(imgUrl) {
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        img.classList.add('mobile-team-img'); // Add class for check
+                        img.style.width = '100%';
+                        img.style.height = '250px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '10px';
+                        img.style.marginBottom = '20px';
+                        item.insertBefore(img, item.firstChild);
+                    }
+                }
             });
         }
     }
+
+    // ========================================================
+    // 9. WINDOW RESIZE HANDLER
+    // ========================================================
+    window.addEventListener('resize', () => {
+        // Debounce resize to prevent performance issues
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(() => {
+            if(locoScroll) locoScroll.update();
+        }, 100);
+    });
+
 });
