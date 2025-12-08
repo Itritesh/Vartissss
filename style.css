@@ -28,19 +28,14 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-/* --- LOCOMOTIVE SCROLL REQUIRED STYLES --- */
-html.has-scroll-smooth { overflow: hidden; }
-html.has-scroll-dragging { user-select: none; }
-.has-scroll-smooth body { overflow: hidden; }
-[data-scroll-container] { min-height: 100vh; }
+html { scroll-behavior: smooth; }
 
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
     font-family: var(--font-body);
     line-height: 1.6;
-    overflow-x: hidden; /* Standard overflow */
+    overflow-x: hidden;
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -50,15 +45,65 @@ body {
 
 /* PRELOADER */
 .preloader {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 10000;
-    display: flex; justify-content: center; align-items: center; flex-direction: column;
-    transition: opacity 0.5s ease, visibility 0.5s;
+    position: fixed; inset: 0; z-index: 10000;
+    background: radial-gradient(circle at 25% 25%, rgba(212,175,55,0.08), transparent 45%),
+                radial-gradient(circle at 75% 70%, rgba(212,175,55,0.06), transparent 40%),
+                #050505;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; transition: opacity 0.6s ease;
 }
-.loader-text { font-family: var(--font-head); font-size: 2rem; color: var(--accent); animation: pulse 1.5s infinite; }
-.loader-bar { width: 200px; height: 2px; background: #333; margin-top: 20px; position: relative; overflow: hidden; }
-.loader-progress { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--accent); transition: width 0.5s; }
-@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+.preloader::after {
+    content: ""; position: absolute; inset: -45%;
+    background: conic-gradient(from 45deg, rgba(212,175,55,0.12), transparent 35%, rgba(212,175,55,0.1));
+    animation: rotateBg 10s linear infinite;
+    filter: blur(60px);
+    opacity: 0.8;
+}
+.preloader::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 70px 70px;
+    opacity: 0.35;
+    animation: gridPan 12s linear infinite;
+}
+.loader-text {
+    font-family: var(--font-head); font-size: 3.4rem; letter-spacing: 0.1rem;
+    font-weight: 800;
+    color: var(--accent); text-transform: uppercase; z-index: 1;
+    text-shadow: 0 0 20px rgba(212,175,55,0.4);
+    animation: pulse 1.8s ease-in-out infinite;
+    position: relative;
+}
+.loader-text::after {
+    content: "_";
+    margin-left: 6px;
+    color: var(--accent);
+    animation: blink 0.9s steps(1) infinite;
+}
+.loader-bar {
+    width: 240px; height: 8px; background: rgba(255,255,255,0.08);
+    margin-top: 22px; position: relative; overflow: hidden; border-radius: 999px;
+    box-shadow: 0 0 20px rgba(212,175,55,0.25);
+}
+.loader-bar::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.12) 40%, transparent 80%);
+    animation: sweep 1.4s linear infinite;
+}
+.loader-progress {
+    position: absolute; inset: 0; width: 0%; height: 100%;
+    background: linear-gradient(90deg, rgba(212,175,55,0.35), var(--accent), rgba(212,175,55,0.75));
+    transition: width 0.5s; border-radius: inherit;
+    box-shadow: 0 0 25px rgba(212,175,55,0.35);
+}
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+@keyframes rotateBg { to { transform: rotate(360deg); } }
+@keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+@keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes gridPan { from { transform: translate3d(0,0,0); } to { transform: translate3d(-40px,-40px,0); } }
 
 /* NAVBAR */
 .navbar {
@@ -91,7 +136,7 @@ body {
 .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
 .bar { width: 25px; height: 3px; background-color: var(--text-main); transition: 0.3s; }
 
-/* BACK TO TOP BUTTON (Existing) */
+/* BACK TO TOP BUTTON */
 .back-to-top {
     position: fixed; bottom: 30px; right: 30px;
     width: 50px; height: 50px; background: var(--accent);
@@ -104,35 +149,20 @@ body {
 
 /* SECTIONS COMMON */
 section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid var(--line); }
-/* Use Clamp for Responsive Font Size on Titles */
-.section-title { 
-    font-family: var(--font-head); 
-    font-size: clamp(2rem, 4vw, 3.5rem); 
-    margin-bottom: 50px; text-align: center; 
-}
+.section-title { font-family: var(--font-head); font-size: 2.5rem; margin-bottom: 50px; text-align: center; }
 .highlight { color: var(--accent); }
 
 /* =========================================
-   3. HOME PAGE STYLES (UPDATED)
+   3. HOME PAGE STYLES
    ========================================= */
 .hero {
-    min-height: 100vh; padding: 150px 5% 50px; /* Increased top padding for fixed nav */
+    min-height: 100vh; padding: 120px 5% 50px;
     display: flex; align-items: center; justify-content: space-between;
     position: relative; overflow: hidden;
 }
 .hero-content { width: 50%; z-index: 2; }
-
-/* FLUID TYPOGRAPHY: Scale from 2.5rem (mobile) to 5rem (desktop) */
-.hero h1 { 
-    font-family: var(--font-head); 
-    font-size: clamp(2.5rem, 5vw, 5rem); 
-    line-height: 1.1; margin-bottom: 20px; 
-}
-.hero p { 
-    color: var(--text-muted); 
-    font-size: clamp(1rem, 1.2vw, 1.1rem); 
-    margin-bottom: 30px; max-width: 500px; 
-}
+.hero h1 { font-family: var(--font-head); font-size: clamp(2.4rem, 5vw + 1rem, 4rem); line-height: 1.1; margin-bottom: 20px; }
+.hero p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px; max-width: 500px; }
 
 .hero-form-container {
     width: 40%; background: var(--bg-card); padding: 40px;
@@ -145,6 +175,28 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
     width: 100%; padding: 12px; background: var(--form-bg);
     border: 1px solid var(--line); color: var(--text-main);
     border-radius: 5px; font-family: var(--font-body); outline: none;
+}
+.form-group select {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--line);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-muted) 50%), 
+                      linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.form-group select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
+.form-group option {
+    background: var(--bg-card);
+    color: var(--text-main);
 }
 .btn-submit {
     width: 100%; padding: 15px; background: var(--accent); border: none;
@@ -159,9 +211,18 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
     top: 50%; left: 45%; transform: translate(-50%, -50%); cursor: grab; z-index: 1;
 }
 .drag-instruction { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: var(--text-muted); width: 200px; text-align: center; }
+.drag-object.small {
+    width: 120px; height: 120px; filter: blur(18px);
+}
+.drag-object.mobile-orb {
+    width: 130px; height: 130px;
+    border: 1px solid rgba(212,175,55,0.6);
+    filter: blur(22px);
+    pointer-events: none;
+}
 
 /* =========================================
-   4. SERVICES PAGE STYLES (PRESERVED)
+   4. SERVICES PAGE STYLES
    ========================================= */
 .service-list { display: grid; gap: 0; }
 .service-item {
@@ -184,7 +245,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .faq-item.active .faq-answer { max-height: 300px; padding-bottom: 30px; }
 
 /* =========================================
-   5. WORK PAGE STYLES (PRESERVED)
+   5. WORK PAGE STYLES
    ========================================= */
 .work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
 .work-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
@@ -197,7 +258,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .review-author { display: block; margin-top: 10px; color: var(--accent); font-weight: bold; font-style: normal;}
 
 /* =========================================
-   6. TEAM PAGE STYLES (PRESERVED)
+   6. TEAM PAGE STYLES
    ========================================= */
 .team-header { padding-top: 150px; text-align: center; }
 .team-header h1 { font-size: 4rem; margin-bottom: 20px; }
@@ -224,7 +285,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .join-team { text-align: center; padding: 100px 0; background: var(--bg-card); }
 
 /* =========================================
-   7. CONTACT PAGE & FOOTER (PRESERVED)
+   7. CONTACT PAGE & FOOTER
    ========================================= */
 .process-steps { display: flex; justify-content: space-around; margin-top: 50px; flex-wrap: wrap; gap: 30px; }
 .step { text-align: center; max-width: 250px; }
@@ -236,10 +297,110 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 .footer-links a:hover { color: var(--accent); }
 
 /* =========================================
-   9. NEW CREATIVE ADDITIONS
+   8. RESPONSIVE
+   ========================================= */
+/* =========================================
+   8. RESPONSIVE & MOBILE (Enhanced)
+   ========================================= */
+@media (max-width: 900px) {
+    .hero { flex-direction: column; text-align: center; padding-top: 150px; }
+    .hero-content { width: 100%; margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
+    .hero-form-container { width: 100%; max-width: 500px; }
+    .hero h1, .team-header h1 { font-size: 2.5rem; }
+    .about-grid, .process-grid { grid-template-columns: 1fr; }
+
+    .marquee-section { transform: rotate(0deg); margin: 0 0 30px 0; }
+    .stats-container { flex-direction: column; gap: 50px; }
+
+    /* Navbar Mobile Logic */
+    .hamburger { display: flex; z-index: 1002; }
+    .nav-links {
+        position: fixed; top: 0; right: -100%;
+        width: 100%; height: 100vh;
+        background: var(--bg-card);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: 0.4s ease-in-out;
+        z-index: 1001;
+    }
+    .nav-links.active { right: 0; }
+
+    /* Team Mobile */
+    .team-list-section { padding: 0 5% 50px; }
+    .team-item {
+        flex-direction: column; align-items: flex-start; padding: 0;
+        border: 1px solid var(--line); border-radius: 15px; overflow: hidden;
+        background: var(--bg-card); margin-bottom: 30px;
+    }
+    .team-item:hover { padding: 0; }
+    .team-index { display: none; }
+    .team-name { margin: 20px; font-size: 1.8rem; }
+    .team-role { margin: 0 20px 20px; }
+    .cursor-img-container { display: none !important; }
+    /* Footer Mobile */
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-socials a { margin: 0 10px; }
+}
+
+@media (max-width: 640px) {
+    body { padding: 0; }
+    .navbar { padding: 16px 6%; }
+    section { padding: 80px 7% 60px; }
+    .hero { padding: 110px 7% 45px; }
+    .hero h1 { font-size: 2.1rem; line-height: 1.12; }
+    .hero p { font-size: 1rem; }
+    .hero-content { text-align: center; }
+    .drag-object { display: none; }
+    .drag-object.mobile-orb { display: block; top: 8%; left: 6%; width: 120px; height: 120px; filter: blur(20px); }
+    .cta-btn { width: 100%; text-align: center; }
+    .hero-form-container { padding: 28px; }
+    .work-grid { grid-template-columns: 1fr; gap: 24px; }
+    .section-title { font-size: 2rem; }
+    .stats-container { gap: 18px; }
+    .stat-number { font-size: 2.6rem; }
+    .cta-banner { padding: 80px 7%; }
+    .cta-banner h2 { font-size: 2rem; }
+    .about-card, .process-card { padding: 22px; }
+    .pill-row { gap: 8px; }
+    body::before {
+        content: "";
+        position: fixed;
+        inset: -30% -20% auto -20%;
+        height: 65%;
+        background: radial-gradient(circle at 50% 50%, rgba(212,175,55,0.14), transparent 60%);
+        filter: blur(70px);
+        opacity: 0.45;
+        pointer-events: none;
+        z-index: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar { padding: 14px 6%; }
+    .hero { padding: 100px 8% 40px; }
+    .hero h1 { font-size: 1.9rem; line-height: 1.08; }
+    .hero p { font-size: 0.95rem; }
+    .section-title { font-size: 1.8rem; }
+    .cta-banner h2 { font-size: 1.8rem; }
+    .hero-form-container { padding: 24px; }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   9. NEW CREATIVE ADDITIONS (ADD TO BOTTOM)
    ========================================= */
 
-/* Hero Grid Background */
+/* 1. Hero Grid Background (Cyberpunk/Tech feel) */
 .hero-bg {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -254,20 +415,22 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
-/* Text Gradient Utility */
+/* 2. Text Gradient Utility */
 .text-gradient {
     background: linear-gradient(90deg, #fff, var(--accent));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
 }
 [data-theme="light"] .text-gradient {
-    background: linear-gradient(90deg, #333, var(--accent));
+    background: linear-gradient(90deg, #7b6b3c, var(--accent));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* Button Styles */
+/* 3. New Button Styles */
 .cta-btn {
     padding: 12px 30px; border-radius: 5px; text-decoration: none;
     font-weight: 600; transition: all 0.3s;
@@ -285,7 +448,7 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     background: var(--text-main); color: var(--bg-main);
 }
 
-/* Infinite Marquee Section */
+/* 4. Infinite Marquee Section */
 .marquee-section {
     background: var(--accent);
     color: #000;
@@ -294,7 +457,7 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     white-space: nowrap;
     position: relative;
     z-index: 2;
-    transform: rotate(-1deg);
+    transform: rotate(-1deg); /* Slight tilt for style */
     margin: -30px 0 50px 0;
 }
 .marquee-content {
@@ -310,18 +473,13 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     100% { transform: translateX(-50%); }
 }
 
-/* NEW: Lottie Box for Animations */
-.lottie-box {
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: flex-start;
-}
+/* 5. Icons in Cards */
 .icon-box {
     font-size: 2.5rem;
     margin-bottom: 15px;
 }
 
-/* Stats Section */
+/* 6. Stats Section */
 .stats-section {
     padding: 80px 5%;
     border-bottom: 1px solid var(--line);
@@ -336,7 +494,7 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 .stat-number {
     display: block;
     font-family: var(--font-head);
-    font-size: clamp(2.5rem, 4vw, 3.5rem); /* Clamped for mobile */
+    font-size: 3.5rem;
     font-weight: 800;
     color: var(--accent);
 }
@@ -345,7 +503,37 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     font-size: 1.1rem;
 }
 
-/* CTA Banner */
+/* About / SEO sections */
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+}
+.about-card, .process-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.about-card h3, .process-card h4 {
+    font-family: var(--font-head);
+    margin-bottom: 12px;
+}
+.pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+.pill {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.process-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+/* 7. CTA Banner */
 .cta-banner {
     text-align: center;
     padding: 100px 5%;
@@ -353,11 +541,11 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 }
 .cta-banner h2 {
     font-family: var(--font-head);
-    font-size: clamp(2rem, 3vw, 2.5rem);
+    font-size: 2.5rem;
     margin-bottom: 10px;
 }
 
-/* Enhanced Footer */
+/* 8. Enhanced Footer */
 .footer-content {
     display: flex;
     justify-content: space-between;
@@ -374,54 +562,10 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 }
 .footer-socials a:hover { color: var(--accent); }
 
-/* =========================================
-   8. RESPONSIVE & MOBILE (Enhanced)
-   ========================================= */
-
 @media (max-width: 900px) {
-    .hero { flex-direction: column; text-align: center; padding-top: 150px; }
-    .hero-content { width: 100%; margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
-    .hero-form-container { width: 100%; max-width: 500px; }
-    
     .marquee-section { transform: rotate(0deg); margin: 0 0 30px 0; }
-    .stats-container { flex-direction: column; gap: 50px; }
-    
-    /* Navbar Mobile Logic */
-    .hamburger { display: flex; z-index: 1002; }
-    .nav-links {
-        position: fixed; top: 0; right: -100%; 
-        width: 100%; height: 100vh;
-        background: var(--bg-card); 
-        flex-direction: column; 
-        align-items: center;
-        justify-content: center; 
-        transition: 0.4s ease-in-out;
-        z-index: 1001;
-    }
-    .nav-links.active { right: 0; }
-
-    /* Footer Mobile */
+    .hero-content h1 { font-size: 2.5rem; }
+    .stats-container { flex-direction: column; }
     .footer-content { flex-direction: column; text-align: center; }
     .footer-socials a { margin: 0 10px; }
-
-    /* Team Mobile */
-    .team-list-section { padding: 0 5% 50px; }
-    .team-item {
-        flex-direction: column; align-items: flex-start; padding: 20px;
-        border: 1px solid var(--line); border-radius: 15px; overflow: hidden;
-        background: var(--bg-card); margin-bottom: 30px;
-    }
-    .team-item:hover { padding: 20px; }
-    .team-index { display: none; }
-    .team-name { margin: 10px 0; font-size: 1.8rem; }
-    .team-role { margin: 0 0 20px; }
-    .cursor-img-container { display: none !important; }
-}
-
-@media (max-width: 480px) {
-    /* Small Phone Tweaks */
-    .hero-form-container { width: 100%; padding: 20px; }
-    .cta-btn { width: 100%; display: block; margin-bottom: 10px; text-align: center;}
-    .work-grid { grid-template-columns: 1fr; } /* Force 1 column on small phones */
-    .work-card { padding: 20px; }
 }
