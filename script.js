@@ -21,13 +21,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     const preloader = document.querySelector('.preloader');
     const progress = document.querySelector('.loader-progress');
+    const loaderText = document.querySelector('.loader-text');
 
     if(preloader && progress) {
-        // Simulate loading bar
-        setTimeout(() => { progress.style.width = "50%"; }, 200);
-        setTimeout(() => { progress.style.width = "100%"; }, 800);
+        let count = 0;
+        const tick = setInterval(() => {
+            count = Math.min(100, count + 4);
+            progress.style.width = `${count}%`;
+            if (loaderText) loaderText.textContent = `${count}%`;
+            if (count >= 100) clearInterval(tick);
+        }, 70);
 
-        // Hide preloader
+        // Hide preloader after animation completes
         setTimeout(() => {
             preloader.style.opacity = '0';
             setTimeout(() => { 
@@ -35,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // CRITICAL: Update Locomotive Scroll once DOM is fully visible
                 if(locoScroll) locoScroll.update(); 
             }, 500);
-        }, 1500);
+        }, 1800);
     }
 
     // ========================================================
@@ -167,19 +172,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // We strictly limit this to Desktop (>1024px) to avoid messing up mobile scrolling
     if (document.querySelector('.drag-object') && window.innerWidth > 1024) {
         gsap.registerPlugin(Draggable);
-        Draggable.create(".drag-object", {
-            type: "x,y",
-            bounds: ".hero",
-            inertia: true,
-            edgeResistance: 0.65,
-            onDragStart: function() {
-                this.target.style.cursor = 'grabbing';
-                this.target.style.filter = 'blur(0px)';
-            },
-            onDragEnd: function() {
-                this.target.style.cursor = 'grab';
-                this.target.style.filter = 'blur(20px)';
-            }
+        document.querySelectorAll(".drag-object").forEach(obj => {
+            const boundsEl = obj.closest('[data-scroll-section]') || ".hero";
+            Draggable.create(obj, {
+                type: "x,y",
+                bounds: boundsEl,
+                inertia: true,
+                edgeResistance: 0.65,
+                onDragStart: function() {
+                    this.target.style.cursor = 'grabbing';
+                    this.target.style.filter = 'blur(0px)';
+                },
+                onDragEnd: function() {
+                    this.target.style.cursor = 'grab';
+                    this.target.style.filter = 'blur(18px)';
+                }
+            });
         });
     }
 
