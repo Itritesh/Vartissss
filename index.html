@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vartistic Studio | Creative Web Development Agency</title>
-    <meta name="description" content="Vartistic Studio specializes in custom web development, responsive design, and SEO strategies to help your business grow online.">
+    <title>Vartistic Studio | Custom Web Design & SEO Agency</title>
+    
+    <!-- CSS: Locomotive Scroll & Your Custom CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.css">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- JS Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 <body>
-    <div class="preloader"><div class="loader-text">VARTISTIC</div><div class="loader-bar"><div class="loader-progress"></div></div></div>
     
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loader-text">VARTISTIC</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+    
+    <!-- NAVIGATION (Fixed outside scroll container) -->
     <nav class="navbar">
         <div class="logo">Vartistic<span>.</span></div>
         <div class="nav-right">
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="#home" data-scroll-to>Home</a></li>
                 <li><a href="work.html">Our Work</a></li>
                 <li><a href="services.html">Services</a></li>
                 <li><a href="team.html">The Squad</a></li>
@@ -27,64 +42,143 @@
         </div>
     </nav>
 
-    <header class="hero">
-        <div class="drag-object"><span class="drag-instruction">Drag Me</span></div>
-        <div class="hero-content">
-            <h1>Crafting Digital <br><span style="color:var(--accent);">Experiences.</span></h1>
-            <p>We are Vartistic Studio. A team of developers and strategists dedicated to building responsive, high-performance websites that help your business rank and convert.</p>
-            <div style="display: flex; gap: 15px;">
-                <a href="services.html" style="padding: 12px 30px; border: 1px solid var(--text-main); color: var(--text-main); text-decoration: none; border-radius: 5px;">Explore Services</a>
+    <!-- SMOOTH SCROLL WRAPPER -->
+    <div id="main-container" data-scroll-container>
+        
+        <!-- HERO SECTION -->
+        <header class="hero" id="home" data-scroll-section>
+            <div class="hero-bg"></div> 
+            
+            <!-- Draggable Object with Parallax -->
+            <div class="drag-object" data-scroll data-scroll-speed="2">
+                <span class="drag-instruction">Drag Me</span>
             </div>
-        </div>
-        <div class="hero-form-container">
-            <form class="hero-form">
-                <h3>Quick Enquiry</h3>
-                <div class="form-group"><input type="text" placeholder="Your Name" required></div>
-                <div class="form-group"><input type="email" placeholder="Your Email" required></div>
-                <div class="form-group">
-                    <select>
-                        <option>Service Needed?</option>
-                        <option>New Website</option>
-                        <option>Redesign</option>
-                        <option>Maintenance</option>
-                    </select>
+
+            <div class="hero-content" data-scroll data-scroll-speed="1">
+                <h1>We Engineer <br><span class="text-gradient">Digital Dominance.</span></h1>
+                <p>Vartistic Studio is a creative web development agency transforming brands with blazing fast code, award-winning UI/UX, and data-driven SEO strategies.</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="services.html" class="cta-btn primary">Explore Services</a>
+                    <a href="work.html" class="cta-btn secondary">View Portfolio</a>
                 </div>
-                <button type="submit" class="btn-submit">Book A Call</button>
-            </form>
-        </div>
-    </header>
-
-    <section id="services">
-        <h2 class="section-title">How We Help You Grow</h2>
-        <div class="work-grid">
-            <div class="work-card" style="padding: 30px;">
-                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Custom Development</h3>
-                <p>We don't rely on generic templates. We write clean, semantic code that Google loves, ensuring your site is fast and secure.</p>
             </div>
-            <div class="work-card" style="padding: 30px;">
-                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">SEO Optimization</h3>
-                <p>Ranking on page 1 isn't luck. We use keyword research, schema markup, and technical SEO to improve your visibility.</p>
+
+            <div class="hero-form-container" data-scroll data-scroll-speed="1.5">
+                <form class="hero-form">
+                    <h3>Start Your Project</h3>
+                    <div class="form-group"><input type="text" placeholder="Your Name" required></div>
+                    <div class="form-group"><input type="email" placeholder="Your Email" required></div>
+                    <div class="form-group">
+                        <select>
+                            <option>Service Type?</option>
+                            <option>Custom Web Development</option>
+                            <option>UI/UX Design</option>
+                            <option>SEO & Performance</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Get Free Consultation</button>
+                </form>
             </div>
-            <div class="work-card" style="padding: 30px;">
-                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Responsive Design</h3>
-                <p>Your site will look perfect on every device—from large desktop monitors to the smallest smartphones.</p>
+        </header>
+
+        <!-- MARQUEE -->
+        <div class="marquee-section" data-scroll-section>
+            <div class="marquee-content" data-scroll data-scroll-speed="2" data-scroll-direction="horizontal">
+                <span>WEB DEVELOPMENT • SEO OPTIMIZATION • UI/UX DESIGN • BRANDING • E-COMMERCE • WEB DEVELOPMENT • SEO OPTIMIZATION • UI/UX DESIGN • </span>
             </div>
         </div>
-    </section>
 
-    <button class="back-to-top">↑</button>
+        <!-- SERVICES SECTION -->
+        <section id="services" data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.5">Elevate Your <span class="highlight">Presence</span></h2>
+            <div class="work-grid">
+                
+                <!-- Service 1 -->
+                <div class="work-card" style="padding: 30px;">
+                    <div class="lottie-box">
+                        <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_w51pcehl.json" background="transparent" speed="1" style="width: 80px; height: 80px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Web Development</h3>
+                    <p>Tailor-made websites built with React, HTML5, and CSS3. Lightweight, secure, and scalable.</p>
+                </div>
 
-    <footer>
-        <p>&copy; 2025 Vartistic Studio. Empowering Businesses Online.</p>
-        <div class="footer-links">
-            <a href="index.html">Home</a>
-            <a href="work.html">Work</a>
-            <a href="services.html">Services</a>
-            <a href="team.html">Team</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </footer>
+                <!-- Service 2 -->
+                <div class="work-card" style="padding: 30px;">
+                    <div class="lottie-box">
+                        <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qp1q7mct.json" background="transparent" speed="1" style="width: 80px; height: 80px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Technical SEO</h3>
+                    <p>We build with Google in mind. Schema markup, Core Web Vitals, and ranking strategies.</p>
+                </div>
 
+                <!-- Service 3 -->
+                <div class="work-card" style="padding: 30px;">
+                    <div class="lottie-box">
+                        <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_yi47lxq5.json" background="transparent" speed="1" style="width: 80px; height: 80px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Creative UI/UX</h3>
+                    <p>Engage your audience with intuitive designs and smooth animations (GSAP) that convert.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- STATS SECTION -->
+        <section class="stats-section" data-scroll-section>
+            <div class="stats-container">
+                <div class="stat-box" data-scroll data-scroll-speed="1">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Projects Delivered</span>
+                </div>
+                <div class="stat-box" data-scroll data-scroll-speed="1.5">
+                    <span class="stat-number">98%</span>
+                    <span class="stat-label">Client Satisfaction</span>
+                </div>
+                <div class="stat-box" data-scroll data-scroll-speed="2">
+                    <span class="stat-number">3x</span>
+                    <span class="stat-label">Traffic Growth</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA BANNER -->
+        <section class="cta-banner" data-scroll-section>
+            <div data-scroll data-scroll-speed="1">
+                <h2>Ready to outrank your competition?</h2>
+                <p>Let's build a website that actually works for your business.</p>
+                <a href="contact.html" class="cta-btn primary" style="margin-top: 20px; display: inline-block;">Let's Talk Business</a>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer data-scroll-section>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Vartistic Studio.</h3>
+                    <p>Creating digital experiences that matter.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="work.html">Our Work</a>
+                    <a href="services.html">Services</a>
+                    <a href="team.html">The Squad</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-socials">
+                    <a href="#">LinkedIn</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vartistic Studio. All Rights Reserved.</p>
+            </div>
+        </footer>
+    
+    </div> <!-- End Main Container -->
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
