@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Work | Vartistic Studio</title>
+    <meta name="description" content="Browse web development, UI/UX, and SEO projects delivered by Vartistic Studio with fast performance and conversion-focused design.">
+    <meta name="keywords" content="web development portfolio, ui ux portfolio, seo case studies, web agency work, ecommerce builds">
+    <meta property="og:title" content="Our Work | Vartistic Studio">
+    <meta property="og:description" content="Selected web, UX, and SEO projects built for speed, rankings, and conversions.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
-    <div class="preloader"><div class="loader-text">WORK</div><div class="loader-bar"><div class="loader-progress"></div></div></div>
+    <div class="preloader"><div class="loader-text">VARTISTIC</div><div class="loader-bar"><div class="loader-progress"></div></div></div>
 
     <nav class="navbar">
         <div class="logo">Vartistic<span>.</span></div>
@@ -25,48 +32,65 @@
         </div>
     </nav>
 
-    <section style="padding-top: 150px;">
-        <h2 class="section-title">Selected Projects</h2>
-        <div class="work-grid">
-            <div class="work-card">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600" alt="Project 1" class="work-thumb">
-                <div class="work-info">
-                    <h3>Finance Dashboard</h3>
-                    <p>A complete redesign focused on speed and data visualization.</p>
-                    <div class="review-box">"Vartistic transformed our outdated platform into a sleek web app." - John D.</div>
+    <div id="main-container" data-scroll-container>
+        <section style="padding-top: 150px;" data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.6">Selected Projects</h2>
+            <div class="work-grid">
+                <div class="work-card" data-scroll data-scroll-speed="0.9">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600" alt="Project 1" class="work-thumb">
+                    <div class="work-info">
+                        <h3>Finance Dashboard</h3>
+                        <p>A complete redesign focused on speed and data visualization.</p>
+                        <div class="review-box">"Vartistic transformed our outdated platform into a sleek web app." - John D.</div>
+                    </div>
+                </div>
+                <div class="work-card" data-scroll data-scroll-speed="0.7">
+                    <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=600" alt="Project 2" class="work-thumb">
+                    <div class="work-info">
+                        <h3>Architecture Portfolio</h3>
+                        <p>Minimalist design highlighting imagery with smooth transitions.</p>
+                        <div class="review-box">"They understood our aesthetic perfectly." - Sarah L.</div>
+                    </div>
+                </div>
+                <div class="work-card" data-scroll data-scroll-speed="0.5">
+                    <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600" alt="Project 3" class="work-thumb">
+                    <div class="work-info">
+                        <h3>E-Commerce Store</h3>
+                        <p>Custom Shopify development with optimized checkout flow.</p>
+                        <div class="review-box">"Sales increased by 40% after the redesign." - Mike R.</div>
+                    </div>
                 </div>
             </div>
-            <div class="work-card">
-                <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=600" alt="Project 2" class="work-thumb">
-                <div class="work-info">
-                    <h3>Architecture Portfolio</h3>
-                    <p>Minimalist design highlighting imagery with smooth transitions.</p>
-                    <div class="review-box">"They understood our aesthetic perfectly." - Sarah L.</div>
-                </div>
-            </div>
-            <div class="work-card">
-                <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600" alt="Project 3" class="work-thumb">
-                <div class="work-info">
-                    <h3>E-Commerce Store</h3>
-                    <p>Custom Shopify development with optimized checkout flow.</p>
-                    <div class="review-box">"Sales increased by 40% after the redesign." - Mike R.</div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <button class="back-to-top">↑</button>
+        <button class="back-to-top">↑</button>
 
-    <footer>
-        <p>&copy; 2025 Vartistic Studio. All Rights Reserved.</p>
-        <div class="footer-links">
-            <a href="index.html">Home</a>
-            <a href="work.html">Work</a>
-            <a href="services.html">Services</a>
-            <a href="team.html">Team</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </footer>
+        <footer data-scroll-section>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Vartistic Studio.</h3>
+                    <p>Creating digital experiences that matter.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="work.html">Our Work</a>
+                    <a href="services.html">Services</a>
+                    <a href="team.html">The Squad</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-socials">
+                    <a href="#">LinkedIn</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vartistic Studio. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
