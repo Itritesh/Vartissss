@@ -38,7 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => { 
                 preloader.style.display = 'none'; 
                 // CRITICAL: Update Locomotive Scroll once DOM is fully visible
-                if(locoScroll) locoScroll.update(); 
+                if(locoScroll) locoScroll.update();
+                
+                // TRIGGER NEW SERVICE HEADER ANIMATION
+                animateServiceHeader();
+                
             }, 500);
         }, 1800);
     }
@@ -143,8 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     // 5. GSAP SCROLL REVEAL (Legacy Support)
     // ========================================================
-    // Note: Locomotive handles 'data-scroll' animations automatically, 
-    // but we keep this for elements without data-scroll attributes.
     if(typeof IntersectionObserver !== 'undefined') {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -169,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     // 6. HOME PAGE: DRAGGABLE OBJECT
     // ========================================================
-    // We strictly limit this to Desktop (>1024px) to avoid messing up mobile scrolling
     if (document.querySelector('.drag-object') && window.innerWidth > 1024) {
         gsap.registerPlugin(Draggable);
         document.querySelectorAll(".drag-object").forEach(obj => {
@@ -245,13 +246,12 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             // Mobile Card Injection
             teamItems.forEach(item => {
-                // Check if image already exists to prevent duplicate injection on resize
                 if(!item.querySelector('.mobile-team-img')) {
                     const imgUrl = item.getAttribute('data-img');
                     if(imgUrl) {
                         const img = document.createElement('img');
                         img.src = imgUrl;
-                        img.classList.add('mobile-team-img'); // Add class for check
+                        img.classList.add('mobile-team-img');
                         img.style.width = '100%';
                         img.style.height = '250px';
                         img.style.objectFit = 'cover';
@@ -268,11 +268,36 @@ document.addEventListener("DOMContentLoaded", () => {
     // 9. WINDOW RESIZE HANDLER
     // ========================================================
     window.addEventListener('resize', () => {
-        // Debounce resize to prevent performance issues
         clearTimeout(window.resizeTimer);
         window.resizeTimer = setTimeout(() => {
             if(locoScroll) locoScroll.update();
         }, 100);
     });
+
+    // ========================================================
+    // 10. NEW: SERVICES HEADER ANIMATION
+    // ========================================================
+    function animateServiceHeader() {
+        const filledText = document.querySelector('.crazy-title .filled');
+        const subtitle = document.querySelector('.crazy-subtitle');
+
+        if(filledText) {
+            // Fill the text (width 0 -> 100%)
+            setTimeout(() => {
+                filledText.style.width = '100%';
+            }, 300);
+        }
+
+        if(subtitle) {
+            // Fade in subtitle
+            gsap.to(subtitle, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                delay: 1,
+                ease: "power2.out"
+            });
+        }
+    }
 
 });
