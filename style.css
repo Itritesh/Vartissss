@@ -297,10 +297,7 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 .footer-links a:hover { color: var(--accent); }
 
 /* =========================================
-   8. RESPONSIVE
-   ========================================= */
-/* =========================================
-   8. RESPONSIVE & MOBILE (Enhanced)
+   8. RESPONSIVE & MOBILE
    ========================================= */
 @media (max-width: 900px) {
     .hero { flex-direction: column; text-align: center; padding-top: 150px; }
@@ -385,16 +382,6 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     .cta-banner h2 { font-size: 1.8rem; }
     .hero-form-container { padding: 24px; }
 }
-
-
-
-
-
-
-
-
-
-
 
 /* =========================================
    9. NEW CREATIVE ADDITIONS (ADD TO BOTTOM)
@@ -568,4 +555,274 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     .stats-container { flex-direction: column; }
     .footer-content { flex-direction: column; text-align: center; }
     .footer-socials a { margin: 0 10px; }
+}
+
+/* =========================================
+   10. NEW ADDITIONS (Services & Parallax)
+   ========================================= */
+.crazy-title-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+.crazy-title {
+    font-family: var(--font-head);
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+[data-theme="light"] .crazy-title {
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.2);
+}
+.crazy-title .filled {
+    position: absolute;
+    top: 0; left: 0;
+    width: 0%;
+    height: 100%;
+    overflow: hidden;
+    color: var(--accent);
+    -webkit-text-stroke: 0;
+    border-right: 4px solid var(--accent);
+    white-space: nowrap;
+    transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.crazy-subtitle {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-top: 30px;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Parallax Header */
+.parallax-header-wrap {
+    position: relative;
+    padding: 20px 0;
+    margin-bottom: 60px;
+    text-align: center;
+    overflow: hidden;
+}
+.parallax-text {
+    font-family: var(--font-head);
+    font-size: 3.5rem;
+    font-weight: 800;
+    position: relative;
+    z-index: 2;
+    color: var(--text-main);
+}
+
+/* =========================================
+   11. NEW SERVICES CARD DESIGN
+   ========================================= */
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    margin-top: 50px;
+}
+
+.feature-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03); /* Glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px 30px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hover Effect */
+.feature-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Inner Layout */
+.card-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.icon-box {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
+}
+
+/* Large Number in Corner */
+.card-step {
+    font-family: var(--font-head);
+    font-size: 4rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.05);
+    line-height: 0.8;
+    transition: color 0.4s;
+}
+
+.feature-card:hover .card-step {
+    color: rgba(212, 175, 55, 0.2); /* Gold fade on hover */
+}
+
+/* Typography */
+.feature-card h3 {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text-main);
+}
+
+.feature-card p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 30px;
+    flex-grow: 1; /* Pushes link to bottom */
+}
+
+/* Link Style */
+.card-link {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.card-link:hover {
+    gap: 10px; /* Animated arrow slide */
+    color: #fff;
+}
+
+/* Subtle Glow Background */
+.card-bg-glow {
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.feature-card:hover .card-bg-glow {
+    opacity: 1;
+}
+
+/* Light Mode Adjustment */
+[data-theme="light"] .feature-card {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .card-step {
+    color: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .feature-card:hover {
+    background: #fff;
+    border-color: var(--accent);
+}
+
+/* =========================================
+   12. MOBILE RESPONSIVENESS FIXES (Text & Layout)
+   ========================================= */
+
+/* Tablet & Mobile Breakpoint */
+@media (max-width: 900px) {
+    
+    /* Fix 1: Shrink the "Crazy" Title on Services Page */
+    .crazy-title {
+        font-size: 3rem; /* Smaller than desktop */
+        line-height: 1.1;
+    }
+    /* Ensure the dot stays with the text */
+    .crazy-title span:last-child {
+        font-size: 3rem !important;
+    }
+    
+    /* Fix 2: Adjust Padding for Services Header */
+    section[data-scroll-section] {
+        padding-top: 120px; /* Reduce the huge 200px gap */
+    }
+
+    /* Fix 3: Shrink Parallax Header on Work Page */
+    .parallax-text {
+        font-size: 2.5rem; /* Much smaller to fit screen */
+        line-height: 1.2;
+        padding: 0 10px; /* Add padding so text doesn't touch edges */
+        white-space: normal; /* Allow wrapping */
+    }
+    
+    /* Reduce top spacing for Parallax section */
+    .parallax-header-wrap {
+        margin-bottom: 30px;
+    }
+    
+    /* Force padding adjustment for specific sections if inline styles persist */
+    section[style*="padding-top: 180px"],
+    section[style*="padding-top: 200px"] {
+        padding-top: 120px !important;
+    }
+}
+
+/* Small Phone Breakpoint (iPhone SE, etc.) */
+@media (max-width: 480px) {
+    
+    /* Make Crazy Title fit on very small screens */
+    .crazy-title {
+        font-size: 2.2rem; 
+        word-wrap: break-word; /* Prevents cutoff */
+    }
+    
+    .crazy-title span:last-child {
+        font-size: 2.2rem !important;
+    }
+
+    .crazy-subtitle {
+        font-size: 1rem;
+        margin-top: 15px;
+    }
+
+    /* Fix "Recent Deliveries" to ensure it fits */
+    .parallax-text {
+        font-size: 2rem; /* Safe size for small phones */
+    }
+    
+    /* Ensure text doesn't overflow horizontally */
+    .parallax-header-wrap {
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    /* Adjust the intro text below the heading */
+    .parallax-header-wrap p {
+        font-size: 0.9rem;
+        padding: 0 15px;
+    }
 }
