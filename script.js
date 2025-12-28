@@ -323,25 +323,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (form.id === 'contactForm' || window.location.pathname.includes('contact')) source = 'contact';
             payload.source = source;
 
-            const tryUrls = ['/send-mail', 'http://localhost:5000/send-mail'];
+            const endpoint = 'https://vartiss-backend.vercel.app/api/send-mail';
             let sent = false;
 
-            for (const url of tryUrls) {
-                try {
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok && data && data.success) {
-                        sent = true;
-                        break;
-                    }
-                } catch (err) {
-                    // Try next URL
-                    console.warn('Mail send attempt failed for', url, err);
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data && data.success) {
+                    sent = true;
+                } else {
+                    console.warn('Send-mail failed', res.status, data);
                 }
+            } catch (err) {
+                console.error('Send-mail error', err);
             }
 
             if (sent) {
