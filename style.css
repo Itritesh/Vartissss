@@ -275,7 +275,7 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 .team-role { font-family: var(--font-body); font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
 
 .cursor-img-container {
-    position: fixed; top: 0; left: 0; width: 300px; height: 400px;
+    position: fixed; top: 0; left: 0; width: 400px; height: 500px;
     z-index: 50; pointer-events: none; opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
     overflow: hidden; border-radius: 10px;
@@ -323,17 +323,28 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
     }
     .nav-links.active { right: 0; }
 
-    /* Team Mobile */
+    /* Team Mobile FIXED */
     .team-list-section { padding: 0 5% 50px; }
     .team-item {
         flex-direction: column; align-items: flex-start; padding: 0;
-        border: 1px solid var(--line); border-radius: 15px; overflow: hidden;
+        border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
         background: var(--bg-card); margin-bottom: 30px;
+        display: flex;
     }
     .team-item:hover { padding: 0; }
     .team-index { display: none; }
-    .team-name { margin: 20px; font-size: 1.8rem; }
-    .team-role { margin: 0 20px 20px; }
+    .team-name { margin: 20px 20px 5px 20px !important; font-size: 1.8rem; flex: none; width: auto; }
+    .team-role { margin: 0 20px 20px 20px !important; }
+    
+    .mobile-team-img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4/5;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+    }
+    
     .cursor-img-container { display: none !important; }
     /* Footer Mobile */
     .footer-content { flex-direction: column; text-align: center; }
@@ -750,79 +761,80 @@ footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color
 }
 
 /* =========================================
-   12. MOBILE RESPONSIVENESS FIXES (Text & Layout)
+   12. MOBILE RESPONSIVENESS FIXES (UPDATED)
    ========================================= */
 
-/* Tablet & Mobile Breakpoint */
 @media (max-width: 900px) {
-    
-    /* Fix 1: Shrink the "Crazy" Title on Services Page */
     .crazy-title {
-        font-size: 3rem; /* Smaller than desktop */
+        font-size: 3rem;
         line-height: 1.1;
     }
-    /* Ensure the dot stays with the text */
-    .crazy-title span:last-child {
-        font-size: 3rem !important;
+    .crazy-title .filled {
+        border-right-width: 3px;
     }
-    
-    /* Fix 2: Adjust Padding for Services Header */
     section[data-scroll-section] {
-        padding-top: 120px; /* Reduce the huge 200px gap */
+        padding-top: 100px;
     }
-
-    /* Fix 3: Shrink Parallax Header on Work Page */
     .parallax-text {
-        font-size: 2.5rem; /* Much smaller to fit screen */
-        line-height: 1.2;
-        padding: 0 10px; /* Add padding so text doesn't touch edges */
-        white-space: normal; /* Allow wrapping */
-    }
-    
-    /* Reduce top spacing for Parallax section */
-    .parallax-header-wrap {
-        margin-bottom: 30px;
-    }
-    
-    /* Force padding adjustment for specific sections if inline styles persist */
-    section[style*="padding-top: 180px"],
-    section[style*="padding-top: 200px"] {
-        padding-top: 120px !important;
+        font-size: 2.2rem;
     }
 }
 
-/* Small Phone Breakpoint (iPhone SE, etc.) */
+/* Perfect Fix for Small Phones (iPhone SE, etc.) */
 @media (max-width: 480px) {
-    
-    /* Make Crazy Title fit on very small screens */
-    .crazy-title {
-        font-size: 2.2rem; 
-        word-wrap: break-word; /* Prevents cutoff */
+    .crazy-title-wrapper {
+        padding: 0 5%; /* Side margins */
+        text-align: left; /* Centers the subtitle and heading block */
+        display:contents;
+        flex-direction: column;
+        align-items: left;
+        width: 100%;
+        box-sizing: border-box;
     }
-    
+
+    .crazy-title {
+        /* Adjusted size to ensure "Capabilities" fits perfectly */
+        font-size: 1.8rem !important; 
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        word-wrap: break-word;
+        display: inline-block;
+        width: 100%;
+        -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Target the dot and the filled span specifically */
     .crazy-title span:last-child {
-        font-size: 2.2rem !important;
+        font-size: 1.8rem !important;
+    }
+
+    .crazy-title .filled {
+        /* Prevents the gold fill from creating an overflow line */
+        border-right: 2px solid var(--accent);
+        white-space: nowrap;
     }
 
     .crazy-subtitle {
-        font-size: 1rem;
-        margin-top: 15px;
+        font-size: 0.95rem;
+        margin: 20px auto 0;
+        line-height: 1.5;
+        padding: 0 10px;
+        opacity: 1; /* Ensure visibility */
+        transform: translateY(0);
+        text-align: left;
     }
 
-    /* Fix "Recent Deliveries" to ensure it fits */
+    /* Fix spacing for the service list items below header */
+    .service-list {
+        margin-top: 60px !important;
+    }
+
+    .service-item h3 {
+        font-size: 1.4rem;
+    }
+
     .parallax-text {
-        font-size: 2rem; /* Safe size for small phones */
-    }
-    
-    /* Ensure text doesn't overflow horizontally */
-    .parallax-header-wrap {
-        width: 100%;
-        overflow: hidden;
-    }
-    
-    /* Adjust the intro text below the heading */
-    .parallax-header-wrap p {
-        font-size: 0.9rem;
+        font-size: 1.8rem;
         padding: 0 15px;
     }
 }
