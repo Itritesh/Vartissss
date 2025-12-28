@@ -323,7 +323,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (form.id === 'contactForm' || window.location.pathname.includes('contact')) source = 'contact';
             payload.source = source;
 
-            const endpoint = 'https://vartiss-backend.vercel.app/api/send-mail';
+            // Choose endpoint: use local Flask during dev; otherwise use same-origin endpoint (no Vercel)
+            const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
+            const endpoint = isLocal ? 'http://localhost:5000/send-mail' : '/send-mail';
             let sent = false;
 
             try {
