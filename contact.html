@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | Vartistic Studio</title>
-    <meta name="description" content="Contact Vartistic Studio for custom web development, UX/UI, ecommerce builds, and technical SEO projects.">
+    <meta name="description"
+        content="Contact Vartistic Studio for custom web development, UX/UI, ecommerce builds, and technical SEO projects.">
     <meta name="keywords" content="contact web agency, start web project, seo consultation, web design quote">
     <meta property="og:title" content="Contact Vartistic Studio">
     <meta property="og:description" content="Start a project: web development, UX/UI, ecommerce, and technical SEO.">
@@ -14,8 +16,14 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
+
 <body>
-    <div class="preloader"><div class="loader-text">VARTISTIC</div><div class="loader-bar"><div class="loader-progress"></div></div></div>
+    <div class="preloader">
+        <div class="loader-text">VARTISTIC</div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
 
     <nav class="navbar">
         <div class="logo">Vartistic<span>.</span></div>
@@ -28,25 +36,45 @@
                 <li><a href="contact.html">Contact</a></li>
             </ul>
             <button class="theme-btn"><span>☀️</span> Mode</button>
-            <div class="hamburger"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+            <div class="hamburger">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
         </div>
     </nav>
 
     <div id="main-container" data-scroll-container>
         <section style="padding-top: 150px; text-align: center;" data-scroll-section>
             <h2 class="section-title" data-scroll data-scroll-speed="0.7">Start Your Project</h2>
-            <p style="margin: 0 auto 50px;" data-scroll data-scroll-speed="0.5">We are ready to bring your vision to life.</p>
+            <p style="margin: 0 auto 50px;" data-scroll data-scroll-speed="0.5">We are ready to bring your vision to
+                life.</p>
             <div class="process-steps">
-                <div class="step" data-scroll data-scroll-speed="0.9"><div class="step-icon">1</div><h3>Fill The Form</h3><p>Tell us about your requirements.</p></div>
-                <div class="step" data-scroll data-scroll-speed="0.7"><div class="step-icon">2</div><h3>Google Meet</h3><p>We schedule a video call.</p></div>
-                <div class="step" data-scroll data-scroll-speed="0.5"><div class="step-icon">3</div><h3>Finalize & Build</h3><p>We start coding your masterpiece.</p></div>
+                <div class="step" data-scroll data-scroll-speed="0.9">
+                    <div class="step-icon">1</div>
+                    <h3>Fill The Form</h3>
+                    <p>Tell us about your requirements.</p>
+                </div>
+                <div class="step" data-scroll data-scroll-speed="0.7">
+                    <div class="step-icon">2</div>
+                    <h3>Google Meet</h3>
+                    <p>We schedule a video call.</p>
+                </div>
+                <div class="step" data-scroll data-scroll-speed="0.5">
+                    <div class="step-icon">3</div>
+                    <h3>Finalize & Build</h3>
+                    <p>We start coding your masterpiece.</p>
+                </div>
             </div>
-            <div class="hero-form-container" style="width: 100%; max-width: 600px; margin: 60px auto 0;" data-scroll data-scroll-speed="0.4">
-                <form class="hero-form">
-                    <div class="form-group"><input type="text" placeholder="Full Name" required></div>
-                    <div class="form-group"><input type="email" placeholder="Business Email" required></div>
-                    <div class="form-group"><input type="tel" placeholder="Phone Number" required></div>
-                    <div class="form-group"><textarea rows="5" placeholder="Project Details..."></textarea></div>
+            <div class="hero-form-container" style="width: 100%; max-width: 600px; margin: 60px auto 0;" data-scroll
+                data-scroll-speed="0.4">
+                <form class="hero-form" id="contactForm">
+                    <div class="form-group"><input type="text" name="name" placeholder="Full Name" required></div>
+                    <div class="form-group"><input type="email" name="email" placeholder="Business Email" required>
+                    </div>
+                    <div class="form-group"><input type="tel" name="phone" placeholder="Phone Number" required></div>
+                    <div class="form-group"><textarea name="message" rows="5"
+                            placeholder="Project Details..."></textarea></div>
                     <button type="submit" class="btn-submit">Submit Enquiry</button>
                 </form>
             </div>
@@ -82,4 +110,5 @@
     <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>

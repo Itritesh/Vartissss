@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // ========================================================
     // 0. INITIALIZE LOCOMOTIVE SCROLL (The "Smooth" Part)
     // ========================================================
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const progress = document.querySelector('.loader-progress');
     const loaderText = document.querySelector('.loader-text');
 
-    if(preloader && progress) {
+    if (preloader && progress) {
         let count = 0;
         const tick = setInterval(() => {
             count = Math.min(100, count + 4);
@@ -35,14 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Hide preloader after animation completes
         setTimeout(() => {
             preloader.style.opacity = '0';
-            setTimeout(() => { 
-                preloader.style.display = 'none'; 
+            setTimeout(() => {
+                preloader.style.display = 'none';
                 // CRITICAL: Update Locomotive Scroll once DOM is fully visible
-                if(locoScroll) locoScroll.update();
-                
+                if (locoScroll) locoScroll.update();
+
                 // TRIGGER NEW SERVICE HEADER ANIMATION
                 animateServiceHeader();
-                
+
             }, 500);
         }, 1800);
     }
@@ -53,13 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const themeBtn = document.querySelector('.theme-btn');
     const icon = themeBtn ? themeBtn.querySelector('span') : null;
     const savedTheme = localStorage.getItem('theme');
-    
+
     if (savedTheme === 'light') {
         document.body.setAttribute('data-theme', 'light');
-        if(icon) icon.textContent = '🌙';
+        if (icon) icon.textContent = '🌙';
     }
 
-    if(themeBtn) {
+    if (themeBtn) {
         themeBtn.addEventListener('click', () => {
             const currentTheme = document.body.getAttribute('data-theme');
             if (currentTheme === 'light') {
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelector('.nav-links');
     const links = document.querySelectorAll('.nav-links li');
 
-    if(hamburger && navLinks) {
+    if (hamburger && navLinks) {
         // Toggle Menu
         hamburger.addEventListener('click', () => {
             navLinks.classList.toggle('active');
@@ -99,10 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const targetId = anchor ? anchor.getAttribute('href') : null;
 
                 // If it's a hash link on the same page
-                if(targetId && targetId.startsWith('#') && locoScroll) {
+                if (targetId && targetId.startsWith('#') && locoScroll) {
                     e.preventDefault();
                     const targetEl = document.querySelector(targetId);
-                    if(targetEl) {
+                    if (targetEl) {
                         locoScroll.scrollTo(targetEl);
                     }
                 }
@@ -114,9 +114,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 4. BACK TO TOP BUTTON (Locomotive Compatible)
     // ========================================================
     const backToTopBtn = document.querySelector('.back-to-top');
-    
-    if(backToTopBtn) {
-        if(locoScroll) {
+
+    if (backToTopBtn) {
+        if (locoScroll) {
             // Locomotive Scroll Listener
             locoScroll.on('scroll', (args) => {
                 if (args.scroll.y > 300) {
@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     // 5. GSAP SCROLL REVEAL (Legacy Support)
     // ========================================================
-    if(typeof IntersectionObserver !== 'undefined') {
+    if (typeof IntersectionObserver !== 'undefined') {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Select elements ONLY if they don't have data-scroll (to avoid conflict)
         document.querySelectorAll('.step, .service-item, .team-item').forEach(el => {
-            if(!el.hasAttribute('data-scroll')) {
+            if (!el.hasAttribute('data-scroll')) {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(30px)';
                 el.style.transition = 'all 0.6s ease-out';
@@ -180,11 +180,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 bounds: boundsEl,
                 inertia: true,
                 edgeResistance: 0.65,
-                onDragStart: function() {
+                onDragStart: function () {
                     this.target.style.cursor = 'grabbing';
                     this.target.style.filter = 'blur(0px)';
                 },
-                onDragEnd: function() {
+                onDragEnd: function () {
                     this.target.style.cursor = 'grab';
                     this.target.style.filter = 'blur(18px)';
                 }
@@ -196,12 +196,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // 7. SERVICES PAGE: FAQ ACCORDION (Preserved)
     // ========================================================
     const faqs = document.querySelectorAll('.faq-item');
-    if(faqs.length > 0) {
+    if (faqs.length > 0) {
         faqs.forEach(faq => {
             faq.addEventListener('click', () => {
                 faq.classList.toggle('active');
                 // Update locomotive scroll layout when accordion expands
-                setTimeout(() => { if(locoScroll) locoScroll.update(); }, 500);
+                setTimeout(() => { if (locoScroll) locoScroll.update(); }, 500);
             });
         });
     }
@@ -219,18 +219,18 @@ document.addEventListener("DOMContentLoaded", () => {
             teamItems.forEach(item => {
                 item.addEventListener('mouseenter', () => {
                     const imgUrl = item.getAttribute('data-img');
-                    if(cursorImg && imgUrl) cursorImg.src = imgUrl;
-                    
-                    if(cursorImgContainer) {
+                    if (cursorImg && imgUrl) cursorImg.src = imgUrl;
+
+                    if (cursorImgContainer) {
                         gsap.to(cursorImgContainer, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" });
                     }
-                    
+
                     // Dim others
-                    teamItems.forEach(other => { if(other !== item) other.style.opacity = '0.3'; });
+                    teamItems.forEach(other => { if (other !== item) other.style.opacity = '0.3'; });
                 });
 
                 item.addEventListener('mouseleave', () => {
-                    if(cursorImgContainer) {
+                    if (cursorImgContainer) {
                         gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
                     }
                     // Reset opacity
@@ -238,20 +238,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 item.addEventListener('mousemove', (e) => {
-                    if(cursorImgContainer) {
+                    if (cursorImgContainer) {
                         gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: "power3.out" });
                     }
                 });
             });
         } else {
-            // Mobile Card Injection - FIXED (No hardcoded styles)
+            // Mobile Card Injection
             teamItems.forEach(item => {
-                if(!item.querySelector('.mobile-team-img')) {
+                if (!item.querySelector('.mobile-team-img')) {
                     const imgUrl = item.getAttribute('data-img');
-                    if(imgUrl) {
+                    if (imgUrl) {
                         const img = document.createElement('img');
                         img.src = imgUrl;
                         img.classList.add('mobile-team-img');
+                        img.style.width = '100%';
+                        img.style.height = '250px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '10px';
+                        img.style.marginBottom = '20px';
                         item.insertBefore(img, item.firstChild);
                     }
                 }
@@ -265,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('resize', () => {
         clearTimeout(window.resizeTimer);
         window.resizeTimer = setTimeout(() => {
-            if(locoScroll) locoScroll.update();
+            if (locoScroll) locoScroll.update();
         }, 100);
     });
 
@@ -276,14 +281,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const filledText = document.querySelector('.crazy-title .filled');
         const subtitle = document.querySelector('.crazy-subtitle');
 
-        if(filledText) {
+        if (filledText) {
             // Fill the text (width 0 -> 100%)
             setTimeout(() => {
                 filledText.style.width = '100%';
             }, 300);
         }
 
-        if(subtitle) {
+        if (subtitle) {
             // Fade in subtitle
             gsap.to(subtitle, {
                 opacity: 1,
@@ -295,4 +300,56 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+});
+
+/* Contact form submit handler (appends safely; does not modify existing logic) */
+document.addEventListener('DOMContentLoaded', () => {
+    // Attach to all hero-form forms (index and contact pages)
+    const forms = document.querySelectorAll('form.hero-form');
+    if (!forms || forms.length === 0) return;
+
+    forms.forEach((form) => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const payload = {};
+            ['name', 'email', 'phone', 'message'].forEach(key => {
+                const v = formData.get(key);
+                if (v !== null) payload[key] = v.toString();
+            });
+
+            // Indicate which form submitted the data so backend can format emails
+            let source = 'index';
+            if (form.id === 'contactForm' || window.location.pathname.includes('contact')) source = 'contact';
+            payload.source = source;
+
+            const tryUrls = ['/send-mail', 'http://localhost:5000/send-mail'];
+            let sent = false;
+
+            for (const url of tryUrls) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok && data && data.success) {
+                        sent = true;
+                        break;
+                    }
+                } catch (err) {
+                    // Try next URL
+                    console.warn('Mail send attempt failed for', url, err);
+                }
+            }
+
+            if (sent) {
+                alert('Enquiry sent successfully');
+                form.reset();
+            } else {
+                alert('Failed to send enquiry');
+            }
+        });
+    });
 });
