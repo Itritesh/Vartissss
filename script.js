@@ -251,6 +251,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
+    // HELPER: sendMail - centralized mail sender (uses absolute backend)
+    // ========================================================
+    async function sendMail(payload, timeout = 12000) {
+        const PROD_ENDPOINT = 'https://vartiss-backend-zvux.vercel.app/send-mail';
+        const LOCAL_ENDPOINT = 'http://localhost:5000/send-mail';
+        const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
+        const endpoint = isLocal ? LOCAL_ENDPOINT : PROD_ENDPOINT;
+        try {
+            return await postJSON(endpoint, payload, timeout);
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    // ========================================================
     // CONTACT: hero-form (keeps existing index hero forms working)
     // ========================================================
     (function attachHeroFormHandlers() {
@@ -266,11 +281,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 ['name', 'email', 'phone', 'message'].forEach(k => { const v = formData.get(k); if (v !== null) payload[k] = v.toString(); });
                 payload.source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
 
-                const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
-                const endpoint = isLocal ? 'http://localhost:5000/send-mail' : 'https://vartiss-backend.vercel.app/send-mail';
                 let sent = false;
                 try {
-                    const { res, data, text } = await postJSON(endpoint, payload, 12000);
+                    const { res, data, text } = await sendMail(payload, 12000);
                     if (res.ok && data && data.success) {
                         sent = true;
                     } else {
@@ -319,25 +332,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-                try {
-                    const endpoint = 'https://vartiss-backend.vercel.app/send-mail';
-                    const { res, data, text } = await postJSON(endpoint, payload, 12000);
-                    if (res.ok && data && data.success) {
-                        alert('Message sent successfully');
-                        form.reset();
-                    } else {
-                        const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`) || text || 'Something went wrong';
-                        alert(errMsg || 'Something went wrong');
-                    }
-                } catch (err) {
-                    console.error('Send-mail network error', err);
-                    if (err.name === 'AbortError') alert('Network timeout. Please try again.');
-                    else alert('Network error. Please try again later.');
-                } finally {
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+            try {
+                const { res, data, text } = await sendMail(payload, 12000);
+                if (res.ok && data && data.success) {
+                    alert('Message sent successfully');
+                    form.reset();
+                } else {
+                    const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`) || text || 'Something went wrong';
+                    alert(errMsg || 'Something went wrong');
                 }
+            } catch (err) {
+                console.error('Send-mail network error', err);
+                if (err.name === 'AbortError') alert('Network timeout. Please try again.');
+                else alert('Network error. Please try again later.');
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+            }
         });
     })();
 
 });
-
