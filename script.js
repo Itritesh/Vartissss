@@ -223,6 +223,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
+    // HELPER: POST JSON with timeout + CORS
+    // ========================================================
+    async function postJSON(url, payload, timeout = 10000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            const text = await res.text();
+            let data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+            return { res, data, text };
+        } catch (err) {
+            clearTimeout(id);
+            throw err;
+        }
+    }
+
+    // ========================================================
     // CONTACT: hero-form (keeps existing index hero forms working)
     // ========================================================
     (function attachHeroFormHandlers() {
@@ -242,15 +270,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 const endpoint = isLocal ? 'http://localhost:5000/send-mail' : 'https://vartiss-backend.vercel.app/send-mail';
                 let sent = false;
                 try {
-                    const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    let data = {};
-                    try { data = await res.json(); } catch (err) { data = { success: false, error: await res.text() }; }
-                    if (res.ok && data && data.success) sent = true;
-                    else { const errMsg = (data && data.error) ? data.error : `Status ${res.status}`; console.warn('Send-mail failed', errMsg, data); alert('Failed to send enquiry: ' + errMsg); }
+                    const { res, data, text } = await postJSON(endpoint, payload, 12000);
+                    if (res.ok && data && data.success) {
+                        sent = true;
+                    } else {
+                        const errMsg = (data && data.error) ? data.error : (res.statusText || `Status ${res.status}`) || text || 'Unknown error';
+                        console.warn('Send-mail failed', errMsg, { res, data, text });
+                        alert('Failed to send enquiry: ' + errMsg);
+                    }
                 } catch (err) {
-                    console.error('Send-mail network error', err); alert('Failed to send enquiry (network error)');
+                    console.error('Send-mail network error', err);
+                    if (err.name === 'AbortError') alert('Network timeout. Please try again.');
+                    else alert('Network error. Please try again later.');
                 }
-                if (sent) { alert('Enquiry sent successfully'); form.reset(); } else { /* Already alerted above */ }
+                if (sent) { alert('Enquiry sent successfully'); form.reset(); }
             });
         });
     })();
@@ -286,24 +319,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            try {
-                const res = await fetch('https://vartiss-backend.vercel.app/send-mail', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                let data = null;
-                try { data = await res.json(); } catch (err) { data = null; }
-
-                if (res.ok && data && data.success) {
-                    alert('Message sent successfully');
-                    form.reset();
-                } else {
-                    const err = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`);
-                    alert(err || 'Something went wrong');
+                try {
+                    const endpoint = 'https://vartiss-backend.vercel.app/send-mail';
+                    const { res, data, text } = await postJSON(endpoint, payload, 12000);
+                    if (res.ok && data && data.success) {
+                        alert('Message sent successfully');
+                        form.reset();
+                    } else {
+                        const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`) || text || 'Something went wrong';
+                        alert(errMsg || 'Something went wrong');
+                    }
+                } catch (err) {
+                    console.error('Send-mail network error', err);
+                    if (err.name === 'AbortError') alert('Network timeout. Please try again.');
+                    else alert('Network error. Please try again later.');
+                } finally {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
                 }
-            } catch (err) {
-                console.error('Send-mail network error', err);
-                alert('Network error. Please try again later.');
-            } finally {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-            }
         });
     })();
 
