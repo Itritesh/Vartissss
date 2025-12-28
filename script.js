@@ -332,14 +332,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json().catch(() => ({}));
+
+                // Try to parse JSON response; fall back to text
+                let data = {};
+                try { data = await res.json(); } catch (e) { data = { success: false, error: await res.text() }; }
+
                 if (res.ok && data && data.success) {
                     sent = true;
                 } else {
-                    console.warn('Send-mail failed', res.status, data);
+                    const errMsg = (data && data.error) ? data.error : `Status ${res.status}`;
+                    console.warn('Send-mail failed', errMsg, data);
+                    alert('Failed to send enquiry: ' + errMsg);
                 }
             } catch (err) {
-                console.error('Send-mail error', err);
+                console.error('Send-mail network error', err);
+                alert('Failed to send enquiry (network error)');
             }
 
             if (sent) {
