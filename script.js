@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         } else {
-            // Mobile Card Injection
+            // Mobile Card Injection - FIXED (No hardcoded styles)
             teamItems.forEach(item => {
                 if(!item.querySelector('.mobile-team-img')) {
                     const imgUrl = item.getAttribute('data-img');
@@ -252,11 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         const img = document.createElement('img');
                         img.src = imgUrl;
                         img.classList.add('mobile-team-img');
-                        img.style.width = '100%';
-                        img.style.height = '250px';
-                        img.style.objectFit = 'cover';
-                        img.style.borderRadius = '10px';
-                        img.style.marginBottom = '20px';
                         item.insertBefore(img, item.firstChild);
                     }
                 }
