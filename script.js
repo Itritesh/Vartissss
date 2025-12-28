@@ -6,18 +6,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const scrollContainer = document.querySelector('[data-scroll-container]');
     let locoScroll = null;
 
-    if (scrollContainer) {
+    if (scrollContainer && typeof LocomotiveScroll !== 'undefined') {
         locoScroll = new LocomotiveScroll({
             el: scrollContainer,
             smooth: true,
-            multiplier: 1, // Scroll speed (1 is default)
-            tablet: { smooth: true }, // Smooth on tablets
-            smartphone: { smooth: true } // Smooth on phones
+            multiplier: 1,
+            tablet: { smooth: true },
+            smartphone: { smooth: true }
         });
     }
 
     // ========================================================
-    // 1. PRELOADER (Enhanced Logic)
+    // 1. PRELOADER
     // ========================================================
     const preloader = document.querySelector('.preloader');
     const progress = document.querySelector('.loader-progress');
@@ -32,23 +32,18 @@ document.addEventListener("DOMContentLoaded", () => {
             if (count >= 100) clearInterval(tick);
         }, 70);
 
-        // Hide preloader after animation completes
         setTimeout(() => {
             preloader.style.opacity = '0';
             setTimeout(() => {
                 preloader.style.display = 'none';
-                // CRITICAL: Update Locomotive Scroll once DOM is fully visible
                 if (locoScroll) locoScroll.update();
-
-                // TRIGGER NEW SERVICE HEADER ANIMATION
-                animateServiceHeader();
-
+                if (typeof animateServiceHeader === 'function') animateServiceHeader();
             }, 500);
         }, 1800);
     }
 
     // ========================================================
-    // 2. THEME TOGGLE (Preserved)
+    // 2. THEME TOGGLE
     // ========================================================
     const themeBtn = document.querySelector('.theme-btn');
     const icon = themeBtn ? themeBtn.querySelector('span') : null;
@@ -65,87 +60,65 @@ document.addEventListener("DOMContentLoaded", () => {
             if (currentTheme === 'light') {
                 document.body.removeAttribute('data-theme');
                 localStorage.setItem('theme', 'dark');
-                icon.textContent = '☀️';
+                if (icon) icon.textContent = '☀️';
             } else {
                 document.body.setAttribute('data-theme', 'light');
                 localStorage.setItem('theme', 'light');
-                icon.textContent = '🌙';
+                if (icon) icon.textContent = '🌙';
             }
         });
     }
 
     // ========================================================
-    // 3. MOBILE MENU (Integrated with Smooth Scroll)
+    // 3. MOBILE MENU
     // ========================================================
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     const links = document.querySelectorAll('.nav-links li');
 
     if (hamburger && navLinks) {
-        // Toggle Menu
         hamburger.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             hamburger.classList.toggle('active');
         });
 
-        // Close menu & Smooth Scroll to section on click
         links.forEach(link => {
             link.addEventListener('click', (e) => {
                 navLinks.classList.remove('active');
                 hamburger.classList.remove('active');
-
-                // Get target href (e.g., #services)
                 const anchor = link.querySelector('a');
                 const targetId = anchor ? anchor.getAttribute('href') : null;
-
-                // If it's a hash link on the same page
                 if (targetId && targetId.startsWith('#') && locoScroll) {
                     e.preventDefault();
                     const targetEl = document.querySelector(targetId);
-                    if (targetEl) {
-                        locoScroll.scrollTo(targetEl);
-                    }
+                    if (targetEl) locoScroll.scrollTo(targetEl);
                 }
             });
         });
     }
 
     // ========================================================
-    // 4. BACK TO TOP BUTTON (Locomotive Compatible)
+    // 4. BACK TO TOP
     // ========================================================
     const backToTopBtn = document.querySelector('.back-to-top');
-
     if (backToTopBtn) {
-        if (locoScroll) {
-            // Locomotive Scroll Listener
+        if (locoScroll && locoScroll.on) {
             locoScroll.on('scroll', (args) => {
-                if (args.scroll.y > 300) {
-                    backToTopBtn.style.display = 'flex';
-                } else {
-                    backToTopBtn.style.display = 'none';
-                }
+                if (args.scroll && args.scroll.y > 300) backToTopBtn.style.display = 'flex';
+                else backToTopBtn.style.display = 'none';
             });
-
-            backToTopBtn.addEventListener('click', () => {
-                locoScroll.scrollTo(0); // Scroll to top
-            });
+            backToTopBtn.addEventListener('click', () => locoScroll.scrollTo(0));
         } else {
-            // Fallback for pages without Locomotive
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    backToTopBtn.style.display = 'flex';
-                } else {
-                    backToTopBtn.style.display = 'none';
-                }
+                if (window.scrollY > 300) backToTopBtn.style.display = 'flex';
+                else backToTopBtn.style.display = 'none';
             });
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         }
     }
 
     // ========================================================
-    // 5. GSAP SCROLL REVEAL (Legacy Support)
+    // 5. GSAP / IntersectionObserver
     // ========================================================
     if (typeof IntersectionObserver !== 'undefined') {
         const observer = new IntersectionObserver((entries) => {
@@ -157,7 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Select elements ONLY if they don't have data-scroll (to avoid conflict)
         document.querySelectorAll('.step, .service-item, .team-item').forEach(el => {
             if (!el.hasAttribute('data-scroll')) {
                 el.style.opacity = '0';
@@ -169,94 +141,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // 6. HOME PAGE: DRAGGABLE OBJECT
+    // 6. DRAGGABLE OBJECT
     // ========================================================
-    if (document.querySelector('.drag-object') && window.innerWidth > 1024) {
-        gsap.registerPlugin(Draggable);
-        document.querySelectorAll(".drag-object").forEach(obj => {
-            const boundsEl = obj.closest('[data-scroll-section]') || ".hero";
+    if (document.querySelector('.drag-object') && window.innerWidth > 1024 && typeof Draggable !== 'undefined') {
+        if (typeof gsap !== 'undefined' && gsap.registerPlugin) gsap.registerPlugin(Draggable);
+        document.querySelectorAll('.drag-object').forEach(obj => {
+            const boundsEl = obj.closest('[data-scroll-section]') || '.hero';
             Draggable.create(obj, {
-                type: "x,y",
+                type: 'x,y',
                 bounds: boundsEl,
                 inertia: true,
                 edgeResistance: 0.65,
-                onDragStart: function () {
-                    this.target.style.cursor = 'grabbing';
-                    this.target.style.filter = 'blur(0px)';
-                },
-                onDragEnd: function () {
-                    this.target.style.cursor = 'grab';
-                    this.target.style.filter = 'blur(18px)';
-                }
+                onDragStart() { this.target.style.cursor = 'grabbing'; this.target.style.filter = 'blur(0px)'; },
+                onDragEnd() { this.target.style.cursor = 'grab'; this.target.style.filter = 'blur(18px)'; }
             });
         });
     }
 
     // ========================================================
-    // 7. SERVICES PAGE: FAQ ACCORDION (Preserved)
+    // 7. FAQ ACCORDION
     // ========================================================
     const faqs = document.querySelectorAll('.faq-item');
-    if (faqs.length > 0) {
+    if (faqs.length) {
         faqs.forEach(faq => {
             faq.addEventListener('click', () => {
                 faq.classList.toggle('active');
-                // Update locomotive scroll layout when accordion expands
                 setTimeout(() => { if (locoScroll) locoScroll.update(); }, 500);
             });
         });
     }
 
     // ========================================================
-    // 8. TEAM PAGE: CINEMATIC HOVER (Preserved)
+    // 8. TEAM HOVER
     // ========================================================
     const teamItems = document.querySelectorAll('.team-item');
     const cursorImgContainer = document.querySelector('.cursor-img-container');
     const cursorImg = document.querySelector('.cursor-img');
 
-    if (teamItems.length > 0) {
+    if (teamItems.length) {
         if (window.innerWidth > 900) {
-            // Desktop Hover Effect
             teamItems.forEach(item => {
                 item.addEventListener('mouseenter', () => {
                     const imgUrl = item.getAttribute('data-img');
                     if (cursorImg && imgUrl) cursorImg.src = imgUrl;
-
-                    if (cursorImgContainer) {
-                        gsap.to(cursorImgContainer, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" });
-                    }
-
-                    // Dim others
+                    if (cursorImgContainer) gsap.to(cursorImgContainer, { opacity: 1, scale: 1, duration: 0.3, ease: 'power2.out' });
                     teamItems.forEach(other => { if (other !== item) other.style.opacity = '0.3'; });
                 });
-
                 item.addEventListener('mouseleave', () => {
-                    if (cursorImgContainer) {
-                        gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
-                    }
-                    // Reset opacity
+                    if (cursorImgContainer) gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
                     teamItems.forEach(other => { other.style.opacity = '1'; });
                 });
-
-                item.addEventListener('mousemove', (e) => {
-                    if (cursorImgContainer) {
-                        gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: "power3.out" });
-                    }
-                });
+                item.addEventListener('mousemove', (e) => { if (cursorImgContainer) gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: 'power3.out' }); });
             });
         } else {
-            // Mobile Card Injection
             teamItems.forEach(item => {
                 if (!item.querySelector('.mobile-team-img')) {
                     const imgUrl = item.getAttribute('data-img');
                     if (imgUrl) {
                         const img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.classList.add('mobile-team-img');
-                        img.style.width = '100%';
-                        img.style.height = '250px';
-                        img.style.objectFit = 'cover';
-                        img.style.borderRadius = '10px';
-                        img.style.marginBottom = '20px';
+                        img.src = imgUrl; img.classList.add('mobile-team-img'); img.style.width = '100%'; img.style.height = '250px'; img.style.objectFit = 'cover'; img.style.borderRadius = '10px'; img.style.marginBottom = '20px';
                         item.insertBefore(img, item.firstChild);
                     }
                 }
@@ -265,514 +208,104 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // 9. WINDOW RESIZE HANDLER
+    // 9. RESIZE
     // ========================================================
-    window.addEventListener('resize', () => {
-        clearTimeout(window.resizeTimer);
-        window.resizeTimer = setTimeout(() => {
-            if (locoScroll) locoScroll.update();
-        }, 100);
-    });
+    window.addEventListener('resize', () => { clearTimeout(window.resizeTimer); window.resizeTimer = setTimeout(() => { if (locoScroll) locoScroll.update(); }, 100); });
 
     // ========================================================
-    // 10. NEW: SERVICES HEADER ANIMATION
+    // 10. SERVICE HEADER ANIMATION
     // ========================================================
     function animateServiceHeader() {
         const filledText = document.querySelector('.crazy-title .filled');
         const subtitle = document.querySelector('.crazy-subtitle');
-
-        if (filledText) {
-            // Fill the text (width 0 -> 100%)
-            setTimeout(() => {
-                filledText.style.width = '100%';
-            }, 300);
-        }
-
-        if (subtitle) {
-            // Fade in subtitle
-            gsap.to(subtitle, {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                delay: 1,
-                ease: "power2.out"
-            });
-        }
-    }
-
-});
-
-// Contact form submit handler for #contactForm
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(form);
-        const payload = {
-            name: (formData.get('name') || '').toString(),
-            email: (formData.get('email') || '').toString(),
-            phone: (formData.get('phone') || '').toString(),
-            message: (formData.get('message') || '').toString(),
-            source: 'contact'
-        };
-
-        // Basic client-side validation
-        if (!payload.name || !payload.email || !payload.message) {
-            alert('Please fill in your name, email, and message.');
-            return;
-        }
-
-        const endpoint = 'https://vartiss-backend.vercel.app/send-mail';
-
-        try {
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            let data = null;
-            try {
-                data = await res.json();
-            } catch (jsonErr) {
-                data = null;
-            }
-
-            if (res.ok && data && data.success) {
-                alert('Message sent successfully');
-                form.reset();
-            } else {
-                const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`);
-                alert(errMsg);
-            }
-        } catch (err) {
-            console.error('Send-mail network error', err);
-            alert('Network error. Please try again later.');
-        }
-    });
-});
-document.addEventListener("DOMContentLoaded", () => {
-
-    // ========================================================
-    // 0. INITIALIZE LOCOMOTIVE SCROLL (The "Smooth" Part)
-    // ========================================================
-    const scrollContainer = document.querySelector('[data-scroll-container]');
-    let locoScroll = null;
-
-    if (scrollContainer) {
-        locoScroll = new LocomotiveScroll({
-            el: scrollContainer,
-            smooth: true,
-            multiplier: 1, // Scroll speed (1 is default)
-            tablet: { smooth: true }, // Smooth on tablets
-            smartphone: { smooth: true } // Smooth on phones
-        });
+        if (filledText) setTimeout(() => { filledText.style.width = '100%'; }, 300);
+        if (subtitle) gsap.to(subtitle, { opacity: 1, y: 0, duration: 1, delay: 1, ease: 'power2.out' });
     }
 
     // ========================================================
-    // 1. PRELOADER (Enhanced Logic)
+    // CONTACT: hero-form (keeps existing index hero forms working)
     // ========================================================
-    const preloader = document.querySelector('.preloader');
-    const progress = document.querySelector('.loader-progress');
-    const loaderText = document.querySelector('.loader-text');
+    (function attachHeroFormHandlers() {
+        const forms = document.querySelectorAll('form.hero-form');
+        if (!forms || forms.length === 0) return;
+        forms.forEach(form => {
+            if (form.dataset.handlerAttached) return;
+            form.dataset.handlerAttached = '1';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const payload = {};
+                ['name', 'email', 'phone', 'message'].forEach(k => { const v = formData.get(k); if (v !== null) payload[k] = v.toString(); });
+                payload.source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
 
-    if (preloader && progress) {
-        let count = 0;
-        const tick = setInterval(() => {
-            count = Math.min(100, count + 4);
-            progress.style.width = `${count}%`;
-            if (loaderText) loaderText.textContent = `${count}%`;
-            if (count >= 100) clearInterval(tick);
-        }, 70);
-
-        // Hide preloader after animation completes
-        setTimeout(() => {
-            preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-                // CRITICAL: Update Locomotive Scroll once DOM is fully visible
-                if (locoScroll) locoScroll.update();
-
-                // TRIGGER NEW SERVICE HEADER ANIMATION
-                animateServiceHeader();
-
-            }, 500);
-        }, 1800);
-    }
-
-    // ========================================================
-    // 2. THEME TOGGLE (Preserved)
-    // ========================================================
-    const themeBtn = document.querySelector('.theme-btn');
-    const icon = themeBtn ? themeBtn.querySelector('span') : null;
-    const savedTheme = localStorage.getItem('theme');
-
-    if (savedTheme === 'light') {
-        document.body.setAttribute('data-theme', 'light');
-        if (icon) icon.textContent = '🌙';
-    }
-
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
-            const currentTheme = document.body.getAttribute('data-theme');
-            if (currentTheme === 'light') {
-                document.body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'dark');
-                icon.textContent = '☀️';
-            } else {
-                document.body.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-                icon.textContent = '🌙';
-            }
-        });
-    }
-
-    // ========================================================
-    // 3. MOBILE MENU (Integrated with Smooth Scroll)
-    // ========================================================
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    const links = document.querySelectorAll('.nav-links li');
-
-    if (hamburger && navLinks) {
-        // Toggle Menu
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-
-        // Close menu & Smooth Scroll to section on click
-        links.forEach(link => {
-            link.addEventListener('click', (e) => {
-                navLinks.classList.remove('active');
-                hamburger.classList.remove('active');
-
-                // Get target href (e.g., #services)
-                const anchor = link.querySelector('a');
-                const targetId = anchor ? anchor.getAttribute('href') : null;
-
-                // If it's a hash link on the same page
-                if (targetId && targetId.startsWith('#') && locoScroll) {
-                    e.preventDefault();
-                    const targetEl = document.querySelector(targetId);
-                    if (targetEl) {
-                        locoScroll.scrollTo(targetEl);
-                    }
+                const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
+                const endpoint = isLocal ? 'http://localhost:5000/send-mail' : 'https://vartiss-backend.vercel.app/send-mail';
+                let sent = false;
+                try {
+                    const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    let data = {};
+                    try { data = await res.json(); } catch (err) { data = { success: false, error: await res.text() }; }
+                    if (res.ok && data && data.success) sent = true;
+                    else { const errMsg = (data && data.error) ? data.error : `Status ${res.status}`; console.warn('Send-mail failed', errMsg, data); alert('Failed to send enquiry: ' + errMsg); }
+                } catch (err) {
+                    console.error('Send-mail network error', err); alert('Failed to send enquiry (network error)');
                 }
+                if (sent) { alert('Enquiry sent successfully'); form.reset(); } else { /* Already alerted above */ }
             });
         });
-    }
+    })();
 
     // ========================================================
-    // 4. BACK TO TOP BUTTON (Locomotive Compatible)
+    // CONTACT: #contactForm (single, cleaned handler)
     // ========================================================
-    const backToTopBtn = document.querySelector('.back-to-top');
+    (function attachContactForm() {
+        const form = document.getElementById('contactForm');
+        if (!form) return;
+        if (form.dataset.contactHandlerAttached) return;
+        form.dataset.contactHandlerAttached = '1';
 
-    if (backToTopBtn) {
-        if (locoScroll) {
-            // Locomotive Scroll Listener
-            locoScroll.on('scroll', (args) => {
-                if (args.scroll.y > 300) {
-                    backToTopBtn.style.display = 'flex';
-                } else {
-                    backToTopBtn.style.display = 'none';
-                }
-            });
-
-            backToTopBtn.addEventListener('click', () => {
-                locoScroll.scrollTo(0); // Scroll to top
-            });
-        } else {
-            // Fallback for pages without Locomotive
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    backToTopBtn.style.display = 'flex';
-                } else {
-                    backToTopBtn.style.display = 'none';
-                }
-            });
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    }
-
-    // ========================================================
-    // 5. GSAP SCROLL REVEAL (Legacy Support)
-    // ========================================================
-    if (typeof IntersectionObserver !== 'undefined') {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        });
-
-        // Select elements ONLY if they don't have data-scroll (to avoid conflict)
-        document.querySelectorAll('.step, .service-item, .team-item').forEach(el => {
-            if (!el.hasAttribute('data-scroll')) {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'all 0.6s ease-out';
-                observer.observe(el);
-            }
-        });
-    }
-
-    // ========================================================
-    // 6. HOME PAGE: DRAGGABLE OBJECT
-    // ========================================================
-    if (document.querySelector('.drag-object') && window.innerWidth > 1024) {
-        gsap.registerPlugin(Draggable);
-        document.querySelectorAll(".drag-object").forEach(obj => {
-            const boundsEl = obj.closest('[data-scroll-section]') || ".hero";
-            Draggable.create(obj, {
-                type: "x,y",
-                bounds: boundsEl,
-                inertia: true,
-                edgeResistance: 0.65,
-                onDragStart: function () {
-                    this.target.style.cursor = 'grabbing';
-                    this.target.style.filter = 'blur(0px)';
-                },
-                onDragEnd: function () {
-                    this.target.style.cursor = 'grab';
-                    this.target.style.filter = 'blur(18px)';
-                }
-            });
-        });
-    }
-
-    // ========================================================
-    // 7. SERVICES PAGE: FAQ ACCORDION (Preserved)
-    // ========================================================
-    const faqs = document.querySelectorAll('.faq-item');
-    if (faqs.length > 0) {
-        faqs.forEach(faq => {
-            faq.addEventListener('click', () => {
-                faq.classList.toggle('active');
-                // Update locomotive scroll layout when accordion expands
-                setTimeout(() => { if (locoScroll) locoScroll.update(); }, 500);
-            });
-        });
-    }
-
-    // ========================================================
-    // 8. TEAM PAGE: CINEMATIC HOVER (Preserved)
-    // ========================================================
-    const teamItems = document.querySelectorAll('.team-item');
-    const cursorImgContainer = document.querySelector('.cursor-img-container');
-    const cursorImg = document.querySelector('.cursor-img');
-
-    if (teamItems.length > 0) {
-        if (window.innerWidth > 900) {
-            // Desktop Hover Effect
-            teamItems.forEach(item => {
-                item.addEventListener('mouseenter', () => {
-                    const imgUrl = item.getAttribute('data-img');
-                    if (cursorImg && imgUrl) cursorImg.src = imgUrl;
-
-                    if (cursorImgContainer) {
-                        gsap.to(cursorImgContainer, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" });
-                    }
-
-                    // Dim others
-                    teamItems.forEach(other => { if (other !== item) other.style.opacity = '0.3'; });
-                });
-
-                item.addEventListener('mouseleave', () => {
-                    if (cursorImgContainer) {
-                        gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
-                    }
-                    // Reset opacity
-                    teamItems.forEach(other => { other.style.opacity = '1'; });
-                });
-
-                item.addEventListener('mousemove', (e) => {
-                    if (cursorImgContainer) {
-                        gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: "power3.out" });
-                    }
-                });
-            });
-        } else {
-            // Mobile Card Injection
-            teamItems.forEach(item => {
-                if (!item.querySelector('.mobile-team-img')) {
-                    const imgUrl = item.getAttribute('data-img');
-                    if (imgUrl) {
-                        const img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.classList.add('mobile-team-img');
-                        img.style.width = '100%';
-                        img.style.height = '250px';
-                        img.style.objectFit = 'cover';
-                        img.style.borderRadius = '10px';
-                        img.style.marginBottom = '20px';
-                        item.insertBefore(img, item.firstChild);
-                    }
-                }
-            });
-        }
-    }
-
-    // ========================================================
-    // 9. WINDOW RESIZE HANDLER
-    // ========================================================
-    window.addEventListener('resize', () => {
-        clearTimeout(window.resizeTimer);
-        window.resizeTimer = setTimeout(() => {
-            if (locoScroll) locoScroll.update();
-        }, 100);
-    });
-
-    // ========================================================
-    // 10. NEW: SERVICES HEADER ANIMATION
-    // ========================================================
-    function animateServiceHeader() {
-        const filledText = document.querySelector('.crazy-title .filled');
-        const subtitle = document.querySelector('.crazy-subtitle');
-
-        if (filledText) {
-            // Fill the text (width 0 -> 100%)
-            setTimeout(() => {
-                filledText.style.width = '100%';
-            }, 300);
-        }
-
-        if (subtitle) {
-            // Fade in subtitle
-            gsap.to(subtitle, {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                delay: 1,
-                ease: "power2.out"
-            });
-        }
-    }
-
-});
-
-/* Contact form submit handler (appends safely; does not modify existing logic) */
-document.addEventListener('DOMContentLoaded', () => {
-    // Attach to all hero-form forms (index and contact pages)
-    const forms = document.querySelectorAll('form.hero-form');
-    if (!forms || forms.length === 0) return;
-
-    forms.forEach((form) => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const submitBtn = form.querySelector("button[type='submit']");
+            const originalText = submitBtn ? submitBtn.innerText : '';
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
+
             const formData = new FormData(form);
-            const payload = {};
-            ['name', 'email', 'phone', 'message'].forEach(key => {
-                const v = formData.get(key);
-                if (v !== null) payload[key] = v.toString();
-            });
+            const payload = {
+                name: (formData.get('name') || '').toString().trim(),
+                email: (formData.get('email') || '').toString().trim(),
+                phone: (formData.get('phone') || '').toString().trim(),
+                message: (formData.get('message') || '').toString().trim(),
+                source: 'contact'
+            };
 
-            // Indicate which form submitted the data so backend can format emails
-            let source = 'index';
-            if (form.id === 'contactForm' || window.location.pathname.includes('contact')) source = 'contact';
-            payload.source = source;
-
-            // Choose endpoint: use local Flask during dev; otherwise use same-origin endpoint (no Vercel)
-            const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
-            const endpoint = isLocal ? 'http://localhost:5000/send-mail' : '/send-mail';
-            let sent = false;
+            if (!payload.name || !payload.email || !payload.message) {
+                alert('Please fill in your name, email, and message.');
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+                return;
+            }
 
             try {
-                const res = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                // Try to parse JSON response; fall back to text
-                let data = {};
-                try { data = await res.json(); } catch (e) { data = { success: false, error: await res.text() }; }
+                const res = await fetch('https://vartiss-backend.vercel.app/send-mail', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                let data = null;
+                try { data = await res.json(); } catch (err) { data = null; }
 
                 if (res.ok && data && data.success) {
-                    sent = true;
+                    alert('Message sent successfully');
+                    form.reset();
                 } else {
-                    const errMsg = (data && data.error) ? data.error : `Status ${res.status}`;
-                    console.warn('Send-mail failed', errMsg, data);
-                    alert('Failed to send enquiry: ' + errMsg);
+                    const err = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`);
+                    alert(err || 'Something went wrong');
                 }
             } catch (err) {
                 console.error('Send-mail network error', err);
-                alert('Failed to send enquiry (network error)');
-            }
-
-            if (sent) {
-                alert('Enquiry sent successfully');
-                form.reset();
-            } else {
-                alert('Failed to send enquiry');
+                alert('Network error. Please try again later.');
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
             }
         });
-        // ===============================
-// CONTACT FORM → BACKEND CONNECT
-// ===============================
+    })();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("contactForm");
-
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const submitBtn = form.querySelector("button[type='submit']");
-    const originalText = submitBtn ? submitBtn.innerText : "";
-
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Sending...";
-    }
-
-    const formData = new FormData(form);
-
-    const payload = {
-      name: formData.get("name")?.trim(),
-      email: formData.get("email")?.trim(),
-      phone: formData.get("phone")?.trim(),
-      message: formData.get("message")?.trim(),
-      source: "contact"
-    };
-
-    try {
-      const response = await fetch(
-        "https://vartiss-backend.vercel.app/send-mail",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.success !== false) {
-        alert("✅ Message sent successfully!");
-        form.reset();
-      } else {
-        alert("❌ " + (result.error || "Something went wrong"));
-      }
-    } catch (error) {
-      alert("❌ Server not reachable. Please try again later.");
-    } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalText;
-      }
-    }
-  });
 });
-    });
-});
+

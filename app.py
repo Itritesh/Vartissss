@@ -23,8 +23,11 @@ def add_cors_headers(response):
     return response
 
 
-@app.route('/send-mail', methods=['POST'])
+@app.route('/send-mail', methods=['POST', 'OPTIONS'])
 def send_mail():
+    # Respond to CORS preflight immediately
+    if request.method == 'OPTIONS':
+        return jsonify(success=True), 200
     try:
         data = request.get_json(force=True)
     except Exception:
