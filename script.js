@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // HELPER: sendMail - centralized mail sender (uses absolute backend)
     // ========================================================
     async function sendMail(payload, timeout = 12000) {
-        const PROD_ENDPOINT = 'https://vartiss-backend-zvux.vercel.app/send-mail';
+        const PROD_ENDPOINT = 'https://vartiss-backend-2.onrender.com/send-mail';
         const LOCAL_ENDPOINT = 'http://localhost:5000/send-mail';
         const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
         const endpoint = isLocal ? LOCAL_ENDPOINT : PROD_ENDPOINT;
