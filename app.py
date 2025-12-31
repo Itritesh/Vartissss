@@ -98,9 +98,12 @@ def send_mail():
     msg.add_alternative(html_body, subtype='html')
 
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        # Use a short socket timeout so a blocked outbound SMTP connection
+        # doesn't hang the HTTP request for too long. Many hosts block
+        # outbound SMTP ports (465/587) which can cause long hangs.
+        SMTP_TIMEOUT = int(os.environ.get('SMTP_TIMEOUT', '10'))
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=SMTP_TIMEOUT) as smtp:
             smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-            # Send to studio
             smtp.send_message(msg)
 
             # Send confirmation to user (best-effort). If this fails, we log but still return success
@@ -110,7 +113,6 @@ def send_mail():
                     confirm = EmailMessage()
                     confirm['From'] = GMAIL_USER
                     confirm['To'] = email
-                    # Confirmation subject/body varies by source
                     if source == 'contact':
                         confirm['Subject'] = "Vartistic Studio — We received your contact enquiry"
                         note = 'Thank you for contacting us via the Contact page.'
@@ -118,14 +120,12 @@ def send_mail():
                         confirm['Subject'] = "Vartistic Studio — We've received your enquiry"
                         note = 'Thank you for your website enquiry.'
 
-                    # Plain-text confirmation
                     confirm_body = (
                         f"Hi {name or ''},\n\n{note} Our team will connect with you shortly.\n\n"
                         f"Here is a copy of your submission:\n\nName:\n{name}\n\nEmail:\n{email}\n\n"
                         f"Phone:\n{phone_display}\n\nMessage:\n{message}\n\n— Vartistic Studio"
                     )
 
-                    # HTML confirmation for nicer UI
                     confirm_html = f"""
                     <html>
                         <body style="margin:0;padding:20px;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
@@ -162,7 +162,8 @@ def send_mail():
 
         return jsonify(success=True, user_email_sent=user_email_sent), 200
     except Exception as e:
-        app.logger.exception('Failed to send email')
+        # Provide clearer error to logs so we can distinguish connection timeouts
+        app.logger.exception('Failed to send email (SMTP)')
         return jsonify(success=False, error=str(e)), 500
 
 

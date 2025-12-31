@@ -251,22 +251,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // HELPER: sendMail - centralized mail sender (uses absolute backend)
+    // HELPER: Formspree submission (replaces backend dependency)
     // ========================================================
-    async function sendMail(payload, timeout = 12000) {
-        const PROD_ENDPOINT = 'https://vartiss-backend-2.onrender.com/send-mail';
-        const LOCAL_ENDPOINT = 'http://localhost:5000/send-mail';
-        const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
-        const endpoint = isLocal ? LOCAL_ENDPOINT : PROD_ENDPOINT;
-        try {
-            return await postJSON(endpoint, payload, timeout);
-        } catch (err) {
-            throw err;
+    async function submitToFormspree(url, payload, timeout = 12000) {
+        // Formspree supports JSON submission; include the payload directly.
+        return await postJSON(url, payload, timeout);
+    }
+
+    // ========================================================
+    // HELPER: show form result (inline)
+    // ========================================================
+    function showFormResult(form, message, success) {
+        let container = form.querySelector('.form-result');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'form-result';
+            container.setAttribute('aria-live', 'polite');
+            container.style.marginTop = '12px';
+            form.appendChild(container);
         }
+        container.textContent = message;
+        container.style.color = success ? '#0a7a0a' : '#b71c1c';
     }
 
     // ========================================================
     // CONTACT: hero-form (keeps existing index hero forms working)
+    // - Now submits directly to Formspree via data-formspree on the form.
     // ========================================================
     (function attachHeroFormHandlers() {
         const forms = document.querySelectorAll('form.hero-form');
@@ -276,33 +286,59 @@ document.addEventListener("DOMContentLoaded", () => {
             form.dataset.handlerAttached = '1';
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const formData = new FormData(form);
-                const payload = {};
-                ['name', 'email', 'phone', 'message'].forEach(k => { const v = formData.get(k); if (v !== null) payload[k] = v.toString(); });
-                payload.source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
 
-                let sent = false;
+                const endpoint = form.dataset.formspree;
+                if (!endpoint) {
+                    alert('Form endpoint not configured.');
+                    return;
+                }
+
+                const submitBtn = form.querySelector("button[type='submit']");
+                const originalText = submitBtn ? submitBtn.innerText : '';
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
+
+                // Build payload from form controls (ignore the hidden honeypot if filled)
+                const formData = new FormData(form);
+                const honey = (formData.get('_gotcha') || '').toString().trim();
+                if (honey) {
+                    // silently drop/pretend success to trap bots
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+                    showFormResult(form, 'Message sent successfully', true);
+                    form.reset();
+                    return;
+                }
+
+                const payload = {};
+                for (const [k, v] of formData.entries()) {
+                    if (k === '_gotcha') continue;
+                    payload[k] = v;
+                }
+
                 try {
-                    const { res, data, text } = await sendMail(payload, 12000);
-                    if (res.ok && data && data.success) {
-                        sent = true;
+                    const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
+                    if (res && (res.status === 200 || res.status === 201)) {
+                        showFormResult(form, 'Enquiry sent successfully', true);
+                        alert('Enquiry sent successfully');
+                        form.reset();
                     } else {
-                        const errMsg = (data && data.error) ? data.error : (res.statusText || `Status ${res.status}`) || text || 'Unknown error';
-                        console.warn('Send-mail failed', errMsg, { res, data, text });
-                        alert('Failed to send enquiry: ' + errMsg);
+                        const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
+                        showFormResult(form, errMsg, false);
+                        alert(errMsg || 'Failed to send enquiry');
                     }
                 } catch (err) {
-                    console.error('Send-mail network error', err);
-                    if (err.name === 'AbortError') alert('Network timeout. Please try again.');
-                    else alert('Network error. Please try again later.');
+                    console.error('Formspree network error', err);
+                    if (err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
+                    else showFormResult(form, 'Network error. Please try again later.', false);
+                    alert(err.name === 'AbortError' ? 'Network timeout. Please try again.' : 'Network error. Please try again later.');
+                } finally {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
                 }
-                if (sent) { alert('Enquiry sent successfully'); form.reset(); }
             });
         });
     })();
 
     // ========================================================
-    // CONTACT: #contactForm (single, cleaned handler)
+    // CONTACT: #contactForm (single, cleaned handler using Formspree)
     // ========================================================
     (function attachContactForm() {
         const form = document.getElementById('contactForm');
@@ -313,38 +349,56 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const endpoint = form.dataset.formspree;
+            if (!endpoint) {
+                alert('Form endpoint not configured.');
+                return;
+            }
+
             const submitBtn = form.querySelector("button[type='submit']");
             const originalText = submitBtn ? submitBtn.innerText : '';
             if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
 
             const formData = new FormData(form);
-            const payload = {
-                name: (formData.get('name') || '').toString().trim(),
-                email: (formData.get('email') || '').toString().trim(),
-                phone: (formData.get('phone') || '').toString().trim(),
-                message: (formData.get('message') || '').toString().trim(),
-                source: 'contact'
-            };
+
+            const honey = (formData.get('_gotcha') || '').toString().trim();
+            if (honey) {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+                showFormResult(form, 'Message sent successfully', true);
+                form.reset();
+                return;
+            }
+
+            const payload = {};
+            ['name', 'email', 'phone', 'message'].forEach(k => {
+                const v = formData.get(k);
+                if (v !== null) payload[k] = v.toString();
+            });
+            payload.source = 'contact';
 
             if (!payload.name || !payload.email || !payload.message) {
+                showFormResult(form, 'Please fill in name, email, and message.', false);
                 alert('Please fill in your name, email, and message.');
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
                 return;
             }
 
             try {
-                const { res, data, text } = await sendMail(payload, 12000);
-                if (res.ok && data && data.success) {
+                const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
+                if (res && (res.status === 200 || res.status === 201)) {
+                    showFormResult(form, 'Message sent successfully', true);
                     alert('Message sent successfully');
                     form.reset();
                 } else {
-                    const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`) || text || 'Something went wrong';
+                    const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Something went wrong';
+                    showFormResult(form, errMsg, false);
                     alert(errMsg || 'Something went wrong');
                 }
             } catch (err) {
-                console.error('Send-mail network error', err);
-                if (err.name === 'AbortError') alert('Network timeout. Please try again.');
-                else alert('Network error. Please try again later.');
+                console.error('Formspree network error', err);
+                if (err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
+                else showFormResult(form, 'Network error. Please try again later.', false);
+                alert(err.name === 'AbortError' ? 'Network timeout. Please try again.' : 'Network error. Please try again later.');
             } finally {
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
             }

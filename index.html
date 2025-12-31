@@ -79,13 +79,18 @@
             </div>
 
             <div class="hero-form-container" data-scroll data-scroll-speed="1.5">
-                <form class="hero-form">
+                <form class="hero-form" data-formspree="https://formspree.io/f/YOUR_FORMSPREE_ID">
                     <h3>Start Your Project</h3>
+
+                    <input type="text" name="_gotcha"
+                        style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;"
+                        tabindex="-1" aria-hidden="true">
+
                     <div class="form-group"><input type="text" name="name" placeholder="Your Name" required></div>
                     <div class="form-group"><input type="email" name="email" placeholder="Your Email" required></div>
                     <div class="form-group">
-                        <select name="message">
-                            <option>What do you need?</option>
+                        <select name="message" required>
+                            <option value="">What do you need?</option>
                             <option>Build from Scratch</option>
                             <option>Template Editing</option>
                             <option>Website Replica/Clone</option>
@@ -94,6 +99,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn-submit">Let's Talk</button>
+                    <div class="form-result" aria-live="polite" style="margin-top:12px;"></div>
                 </form>
             </div>
         </header>
