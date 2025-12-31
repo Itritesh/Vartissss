@@ -251,16 +251,114 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // HELPER: Formspree submission (replaces backend dependency)
+    // HELPER: sendMail - centralized mail sender (uses absolute backend)
     // ========================================================
-    async function submitToFormspree(url, payload, timeout = 12000) {
-        // Formspree supports JSON submission; include the payload directly.
-        return await postJSON(url, payload, timeout);
+    async function sendMail(payload, timeout = 12000) {
+        const PROD_ENDPOINT = 'https://vartiss-backend-2.onrender.com/send-mail';
+        const LOCAL_ENDPOINT = 'http://localhost:5000/send-mail';
+        const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
+        const endpoint = isLocal ? LOCAL_ENDPOINT : PROD_ENDPOINT;
+        try {
+            return await postJSON(endpoint, payload, timeout);
+        } catch (err) {
+            throw err;
+        }
     }
 
     // ========================================================
-    // HELPER: show form result (inline)
+    // CONTACT: hero-form (keeps existing index hero forms working)
     // ========================================================
+    (function attachHeroFormHandlers() {
+        const forms = document.querySelectorAll('form.hero-form');
+        if (!forms || forms.length === 0) return;
+        forms.forEach(form => {
+            if (form.dataset.handlerAttached) return;
+            form.dataset.handlerAttached = '1';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const payload = {};
+                ['name', 'email', 'phone', 'message'].forEach(k => { const v = formData.get(k); if (v !== null) payload[k] = v.toString(); });
+                payload.source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
+
+                let sent = false;
+                try {
+                    const { res, data, text } = await sendMail(payload, 12000);
+                    if (res.ok && data && data.success) {
+                        sent = true;
+                    } else {
+                        const errMsg = (data && data.error) ? data.error : (res.statusText || `Status ${res.status}`) || text || 'Unknown error';
+                        console.warn('Send-mail failed', errMsg, { res, data, text });
+                        alert('Failed to send enquiry: ' + errMsg);
+                    }
+                } catch (err) {
+                    console.error('Send-mail network error', err);
+                    if (err.name === 'AbortError') alert('Network timeout. Please try again.');
+                    else alert('Network error. Please try again later.');
+                }
+                if (sent) { alert('Enquiry sent successfully'); form.reset(); }
+            });
+        });
+    })();
+
+    // ========================================================
+    // CONTACT: #contactForm (single, cleaned handler)
+    // ========================================================
+    (function attachContactForm() {
+        const form = document.getElementById('contactForm');
+        if (!form) return;
+        if (form.dataset.contactHandlerAttached) return;
+        form.dataset.contactHandlerAttached = '1';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector("button[type='submit']");
+            const originalText = submitBtn ? submitBtn.innerText : '';
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
+
+            const formData = new FormData(form);
+            const payload = {
+                name: (formData.get('name') || '').toString().trim(),
+                email: (formData.get('email') || '').toString().trim(),
+                phone: (formData.get('phone') || '').toString().trim(),
+                message: (formData.get('message') || '').toString().trim(),
+                source: 'contact'
+            };
+
+            if (!payload.name || !payload.email || !payload.message) {
+                alert('Please fill in your name, email, and message.');
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+                return;
+            }
+
+            try {
+                const { res, data, text } = await sendMail(payload, 12000);
+                if (res.ok && data && data.success) {
+                    alert('Message sent successfully');
+                    form.reset();
+                } else {
+                    const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`) || text || 'Something went wrong';
+                    alert(errMsg || 'Something went wrong');
+                }
+            } catch (err) {
+                console.error('Send-mail network error', err);
+                if (err.name === 'AbortError') alert('Network timeout. Please try again.');
+                else alert('Network error. Please try again later.');
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
+            }
+        });
+    })();
+
+    // ========================================================
+    // HELPER: Formspree submission (replaces backend dependency)
+    // ========================================================
+    async function submitToFormspree(url, payload, timeout = 12000) {
+        return await postJSON(url, payload, timeout);
+    }
+
+    // HELPER: show form result (inline)
     function showFormResult(form, message, success) {
         let container = form.querySelector('.form-result');
         if (!container) {
@@ -274,10 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container.style.color = success ? '#0a7a0a' : '#b71c1c';
     }
 
-    // ========================================================
-    // CONTACT: hero-form (keeps existing index hero forms working)
-    // - Now submits directly to Formspree via data-formspree on the form.
-    // ========================================================
+    // HERO forms (index + any other .hero-form)
     (function attachHeroFormHandlers() {
         const forms = document.querySelectorAll('form.hero-form');
         if (!forms || forms.length === 0) return;
@@ -287,9 +382,11 @@ document.addEventListener("DOMContentLoaded", () => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const endpoint = form.dataset.formspree;
-                if (!endpoint) {
-                    alert('Form endpoint not configured.');
+                // prefer explicit data-formspree then action attribute
+                const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
+                if (!endpoint || endpoint.includes('REPLACE_WITH_FORMSPREE_ID') || endpoint.includes('YOUR_FORMSPREE_ID')) {
+                    showFormResult(form, 'Form endpoint not configured. Replace REPLACE_WITH_FORMSPREE_ID with your Formspree ID.', false);
+                    alert('Form endpoint not configured. Please set your Formspree form ID.');
                     return;
                 }
 
@@ -297,11 +394,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const originalText = submitBtn ? submitBtn.innerText : '';
                 if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
 
-                // Build payload from form controls (ignore the hidden honeypot if filled)
                 const formData = new FormData(form);
                 const honey = (formData.get('_gotcha') || '').toString().trim();
                 if (honey) {
-                    // silently drop/pretend success to trap bots
                     if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
                     showFormResult(form, 'Message sent successfully', true);
                     form.reset();
@@ -320,6 +415,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         showFormResult(form, 'Enquiry sent successfully', true);
                         alert('Enquiry sent successfully');
                         form.reset();
+                    } else if (res && res.status === 404) {
+                        showFormResult(form, 'Form not found — check your Formspree ID', false);
+                        alert('Form not found — check your Formspree ID');
                     } else {
                         const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
                         showFormResult(form, errMsg, false);
@@ -337,9 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     })();
 
-    // ========================================================
-    // CONTACT: #contactForm (single, cleaned handler using Formspree)
-    // ========================================================
+    // CONTACT form (#contactForm) — single handler
     (function attachContactForm() {
         const form = document.getElementById('contactForm');
         if (!form) return;
@@ -349,9 +445,10 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const endpoint = form.dataset.formspree;
-            if (!endpoint) {
-                alert('Form endpoint not configured.');
+            const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
+            if (!endpoint || endpoint.includes('REPLACE_WITH_FORMSPREE_ID') || endpoint.includes('YOUR_FORMSPREE_ID')) {
+                showFormResult(form, 'Form endpoint not configured. Replace REPLACE_WITH_FORMSPREE_ID with your Formspree ID.', false);
+                alert('Form endpoint not configured. Please set your Formspree form ID.');
                 return;
             }
 
@@ -360,7 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
 
             const formData = new FormData(form);
-
             const honey = (formData.get('_gotcha') || '').toString().trim();
             if (honey) {
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
@@ -389,6 +485,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     showFormResult(form, 'Message sent successfully', true);
                     alert('Message sent successfully');
                     form.reset();
+                } else if (res && res.status === 404) {
+                    showFormResult(form, 'Form not found — check your Formspree ID', false);
+                    alert('Form not found — check your Formspree ID');
                 } else {
                     const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Something went wrong';
                     showFormResult(form, errMsg, false);
