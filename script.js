@@ -253,101 +253,133 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     // HELPER: sendMail - centralized mail sender (uses absolute backend)
     // ========================================================
-    async function sendMail(payload, timeout = 12000) {
-        const PROD_ENDPOINT = 'https://vartiss-backend-2.onrender.com/send-mail';
-        const LOCAL_ENDPOINT = 'http://localhost:5000/send-mail';
-        const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:');
-        const endpoint = isLocal ? LOCAL_ENDPOINT : PROD_ENDPOINT;
+    async function sendMail(payload) {
+        // Production backend (Railway) — used when the site is deployed to Netlify
+        const PROD_ENDPOINT = 'https://vartiss-backend-production.up.railway.app/send-mail';
+        const LOCAL_ENDPOINTS = [
+            // local dev http server
+            'http://localhost:5000/send-mail',
+            'http://localhost:5001/send-mail',
+            // relative fallback when frontend is served from the same origin
+            '/send-mail'
+        ];
+
+        // Try prod first, then fall back to local endpoints to aid local development
         try {
-            return await postJSON(endpoint, payload, timeout);
+            return await postJSON(PROD_ENDPOINT, payload);
         } catch (err) {
+            console.warn('Prod endpoint failed, attempting local fallbacks', err);
+            for (const ep of LOCAL_ENDPOINTS) {
+                try {
+                    const resp = await postJSON(ep, payload);
+                    return resp;
+                } catch (e) {
+                    console.warn('Fallback endpoint failed:', ep, e);
+                }
+            }
+            // If all endpoints fail, rethrow the original error
             throw err;
         }
     }
 
     // ========================================================
-    // CONTACT: hero-form (keeps existing index hero forms working)
+    // FORMS: unified handlers (single listener per form, normalizes payload)
     // ========================================================
-    (function attachHeroFormHandlers() {
-        const forms = document.querySelectorAll('form.hero-form');
+    (function attachUnifiedFormHandlers() {
+        const forms = document.querySelectorAll('form.hero-form, form#contactForm');
         if (!forms || forms.length === 0) return;
+
+        function normalizeFieldValue(v) {
+            if (v === null || typeof v === 'undefined') return '';
+            const s = v.toString().trim();
+            if (!s) return '';
+            const lower = s.toLowerCase();
+            if (lower === 'select' || lower === 'choose' || lower === 'select an option' || lower === 'please select') return '';
+            return s;
+        }
+
         forms.forEach(form => {
-            if (form.dataset.handlerAttached) return;
-            form.dataset.handlerAttached = '1';
+            if (form.dataset.unifiedHandlerAttached) return;
+            form.dataset.unifiedHandlerAttached = '1';
+
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const formData = new FormData(form);
-                const payload = {};
-                ['name', 'email', 'phone', 'message'].forEach(k => { const v = formData.get(k); if (v !== null) payload[k] = v.toString(); });
-                payload.source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
 
-                let sent = false;
+                const submitBtn = form.querySelector("button[type='submit']");
+                const originalText = submitBtn ? submitBtn.innerText : null;
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
+
+                const formData = new FormData(form);
+
+                // honeypot
+                const honey = normalizeFieldValue(formData.get('_gotcha'));
+                if (honey) {
+                    if (submitBtn) { submitBtn.disabled = false; if (originalText) submitBtn.innerText = originalText; }
+                    showFormResult(form, 'Message sent successfully', true);
+                    form.reset();
+                    return;
+                }
+
+                const source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
+                const payload = {
+                    name: normalizeFieldValue(formData.get('name')),
+                    email: normalizeFieldValue(formData.get('email')),
+                    phone: normalizeFieldValue(formData.get('phone')),
+                    message: normalizeFieldValue(formData.get('message')),
+                    source
+                };
+
+                // Basic client-side required check for contact form only
+                if (form.id === 'contactForm') {
+                    if (!payload.name || !payload.email || !payload.message) {
+                        showFormResult(form, 'Please fill in your name, email, and message.', false);
+                        if (submitBtn) { submitBtn.disabled = false; if (originalText) submitBtn.innerText = originalText; }
+                        return;
+                    }
+                }
+
                 try {
-                    const { res, data, text } = await sendMail(payload, 12000);
-                    if (res.ok && data && data.success) {
-                        sent = true;
+                    const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
+                    if (endpoint && (endpoint.includes('formspree.io') || endpoint.toLowerCase().includes('formspree'))) {
+                        // send to Formspree if explicitly configured
+                        const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
+                        if (res && (res.status === 200 || res.status === 201)) {
+                            showFormResult(form, 'Enquiry sent successfully', true);
+                            form.reset();
+                        } else if (res && res.status === 404) {
+                            showFormResult(form, 'Form not found — check your Formspree ID', false);
+                        } else {
+                            const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
+                            showFormResult(form, errMsg, false);
+                        }
                     } else {
-                        const errMsg = (data && data.error) ? data.error : (res.statusText || `Status ${res.status}`) || text || 'Unknown error';
-                        console.warn('Send-mail failed', errMsg, { res, data, text });
-                        alert('Failed to send enquiry: ' + errMsg);
+                        // default: use production Railway endpoint via sendMail
+                        const { res, data, text } = await sendMail(payload, 12000);
+                        if (res && res.ok) {
+                            // success if backend marks success or returns message
+                            if (data && (data.success || data.message)) {
+                                showFormResult(form, 'Message sent successfully', true);
+                                form.reset();
+                            } else if (data && data.error) {
+                                showFormResult(form, data.error, false);
+                            } else {
+                                // fallback: treat ok responses as success
+                                showFormResult(form, 'Message sent successfully', true);
+                                form.reset();
+                            }
+                        } else {
+                            const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
+                            showFormResult(form, errMsg, false);
+                        }
                     }
                 } catch (err) {
-                    console.error('Send-mail network error', err);
-                    if (err.name === 'AbortError') alert('Network timeout. Please try again.');
-                    else alert('Network error. Please try again later.');
+                    console.error('Submission network error', err);
+                    if (err && err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
+                    else showFormResult(form, 'Network error. Please try again later.', false);
+                } finally {
+                    if (submitBtn) { submitBtn.disabled = false; if (originalText) submitBtn.innerText = originalText; }
                 }
-                if (sent) { alert('Enquiry sent successfully'); form.reset(); }
             });
-        });
-    })();
-
-    // ========================================================
-    // CONTACT: #contactForm (single, cleaned handler)
-    // ========================================================
-    (function attachContactForm() {
-        const form = document.getElementById('contactForm');
-        if (!form) return;
-        if (form.dataset.contactHandlerAttached) return;
-        form.dataset.contactHandlerAttached = '1';
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const submitBtn = form.querySelector("button[type='submit']");
-            const originalText = submitBtn ? submitBtn.innerText : '';
-            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
-
-            const formData = new FormData(form);
-            const payload = {
-                name: (formData.get('name') || '').toString().trim(),
-                email: (formData.get('email') || '').toString().trim(),
-                phone: (formData.get('phone') || '').toString().trim(),
-                message: (formData.get('message') || '').toString().trim(),
-                source: 'contact'
-            };
-
-            if (!payload.name || !payload.email || !payload.message) {
-                alert('Please fill in your name, email, and message.');
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-                return;
-            }
-
-            try {
-                const { res, data, text } = await sendMail(payload, 12000);
-                if (res.ok && data && data.success) {
-                    alert('Message sent successfully');
-                    form.reset();
-                } else {
-                    const errMsg = (data && data.error) ? data.error : (res.statusText || `Server error (${res.status})`) || text || 'Something went wrong';
-                    alert(errMsg || 'Something went wrong');
-                }
-            } catch (err) {
-                console.error('Send-mail network error', err);
-                if (err.name === 'AbortError') alert('Network timeout. Please try again.');
-                else alert('Network error. Please try again later.');
-            } finally {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-            }
         });
     })();
 
@@ -372,136 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
         container.style.color = success ? '#0a7a0a' : '#b71c1c';
     }
 
-    // HERO forms (index + any other .hero-form)
-    (function attachHeroFormHandlers() {
-        const forms = document.querySelectorAll('form.hero-form');
-        if (!forms || forms.length === 0) return;
-        forms.forEach(form => {
-            if (form.dataset.handlerAttached) return;
-            form.dataset.handlerAttached = '1';
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
 
-                // prefer explicit data-formspree then action attribute
-                const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
-                if (!endpoint || endpoint.includes('REPLACE_WITH_FORMSPREE_ID') || endpoint.includes('YOUR_FORMSPREE_ID')) {
-                    showFormResult(form, 'Form endpoint not configured. Replace REPLACE_WITH_FORMSPREE_ID with your Formspree ID.', false);
-                    alert('Form endpoint not configured. Please set your Formspree form ID.');
-                    return;
-                }
-
-                const submitBtn = form.querySelector("button[type='submit']");
-                const originalText = submitBtn ? submitBtn.innerText : '';
-                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
-
-                const formData = new FormData(form);
-                const honey = (formData.get('_gotcha') || '').toString().trim();
-                if (honey) {
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-                    showFormResult(form, 'Message sent successfully', true);
-                    form.reset();
-                    return;
-                }
-
-                const payload = {};
-                for (const [k, v] of formData.entries()) {
-                    if (k === '_gotcha') continue;
-                    payload[k] = v;
-                }
-
-                try {
-                    const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
-                    if (res && (res.status === 200 || res.status === 201)) {
-                        showFormResult(form, 'Enquiry sent successfully', true);
-                        alert('Enquiry sent successfully');
-                        form.reset();
-                    } else if (res && res.status === 404) {
-                        showFormResult(form, 'Form not found — check your Formspree ID', false);
-                        alert('Form not found — check your Formspree ID');
-                    } else {
-                        const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
-                        showFormResult(form, errMsg, false);
-                        alert(errMsg || 'Failed to send enquiry');
-                    }
-                } catch (err) {
-                    console.error('Formspree network error', err);
-                    if (err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
-                    else showFormResult(form, 'Network error. Please try again later.', false);
-                    alert(err.name === 'AbortError' ? 'Network timeout. Please try again.' : 'Network error. Please try again later.');
-                } finally {
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-                }
-            });
-        });
-    })();
-
-    // CONTACT form (#contactForm) — single handler
-    (function attachContactForm() {
-        const form = document.getElementById('contactForm');
-        if (!form) return;
-        if (form.dataset.contactHandlerAttached) return;
-        form.dataset.contactHandlerAttached = '1';
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
-            if (!endpoint || endpoint.includes('REPLACE_WITH_FORMSPREE_ID') || endpoint.includes('YOUR_FORMSPREE_ID')) {
-                showFormResult(form, 'Form endpoint not configured. Replace REPLACE_WITH_FORMSPREE_ID with your Formspree ID.', false);
-                alert('Form endpoint not configured. Please set your Formspree form ID.');
-                return;
-            }
-
-            const submitBtn = form.querySelector("button[type='submit']");
-            const originalText = submitBtn ? submitBtn.innerText : '';
-            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
-
-            const formData = new FormData(form);
-            const honey = (formData.get('_gotcha') || '').toString().trim();
-            if (honey) {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-                showFormResult(form, 'Message sent successfully', true);
-                form.reset();
-                return;
-            }
-
-            const payload = {};
-            ['name', 'email', 'phone', 'message'].forEach(k => {
-                const v = formData.get(k);
-                if (v !== null) payload[k] = v.toString();
-            });
-            payload.source = 'contact';
-
-            if (!payload.name || !payload.email || !payload.message) {
-                showFormResult(form, 'Please fill in name, email, and message.', false);
-                alert('Please fill in your name, email, and message.');
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-                return;
-            }
-
-            try {
-                const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
-                if (res && (res.status === 200 || res.status === 201)) {
-                    showFormResult(form, 'Message sent successfully', true);
-                    alert('Message sent successfully');
-                    form.reset();
-                } else if (res && res.status === 404) {
-                    showFormResult(form, 'Form not found — check your Formspree ID', false);
-                    alert('Form not found — check your Formspree ID');
-                } else {
-                    const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Something went wrong';
-                    showFormResult(form, errMsg, false);
-                    alert(errMsg || 'Something went wrong');
-                }
-            } catch (err) {
-                console.error('Formspree network error', err);
-                if (err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
-                else showFormResult(form, 'Network error. Please try again later.', false);
-                alert(err.name === 'AbortError' ? 'Network timeout. Please try again.' : 'Network error. Please try again later.');
-            } finally {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; }
-            }
-        });
-    })();
 
 });
