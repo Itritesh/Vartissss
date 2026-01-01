@@ -165,6 +165,7 @@ def send_mail():
         # Provide clearer error to logs so we can distinguish connection timeouts
         app.logger.exception('Failed to send email (SMTP)')
         return jsonify(success=False, error=str(e)), 500
+    
 
 
 if __name__ == '__main__':
