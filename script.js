@@ -305,16 +305,21 @@ document.addEventListener("DOMContentLoaded", () => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
+                // Prevent re-entrancy/double submissions
+                if (form.dataset.submitting === '1') return;
+                form.dataset.submitting = '1';
+
                 const submitBtn = form.querySelector("button[type='submit']");
                 const originalText = submitBtn ? submitBtn.innerText : null;
-                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; submitBtn.setAttribute('aria-busy', 'true'); }
 
                 const formData = new FormData(form);
 
                 // honeypot
                 const honey = normalizeFieldValue(formData.get('_gotcha'));
                 if (honey) {
-                    if (submitBtn) { submitBtn.disabled = false; if (originalText) submitBtn.innerText = originalText; }
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
+                    form.dataset.submitting = '0';
                     showFormResult(form, 'Message sent successfully', true);
                     form.reset();
                     return;
@@ -333,7 +338,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (form.id === 'contactForm') {
                     if (!payload.name || !payload.email || !payload.message) {
                         showFormResult(form, 'Please fill in your name, email, and message.', false);
-                        if (submitBtn) { submitBtn.disabled = false; if (originalText) submitBtn.innerText = originalText; }
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
+                        form.dataset.submitting = '0';
                         return;
                     }
                 }
@@ -377,7 +383,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (err && err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
                     else showFormResult(form, 'Network error. Please try again later.', false);
                 } finally {
-                    if (submitBtn) { submitBtn.disabled = false; if (originalText) submitBtn.innerText = originalText; }
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
+                    form.dataset.submitting = '0';
                 }
             });
         });
