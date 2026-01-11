@@ -264,22 +264,52 @@ document.addEventListener("DOMContentLoaded", () => {
             '/send-mail'
         ];
 
-        // Try prod first, then fall back to local endpoints to aid local development
+        // Try prod first, with a retry for Railway cold starts (longer timeout)
         try {
-            return await postJSON(PROD_ENDPOINT, payload);
-        } catch (err) {
-            console.warn('Prod endpoint failed, attempting local fallbacks', err);
-            for (const ep of LOCAL_ENDPOINTS) {
-                try {
-                    const resp = await postJSON(ep, payload);
-                    return resp;
-                } catch (e) {
-                    console.warn('Fallback endpoint failed:', ep, e);
+            // first attempt - moderate timeout
+            let attempt = await postJSON(PROD_ENDPOINT, payload, 15000);
+            // if we received a response, return it (caller will inspect data.success)
+            if (attempt && attempt.res) {
+                // if server error (5xx) attempt one retry with extended timeout
+                if (!attempt.res.ok && attempt.res.status >= 500) {
+                    console.warn('Production endpoint returned server error, retrying with extended timeout', attempt.res.status);
+                    try {
+                        await new Promise(r => setTimeout(r, 1200));
+                        const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
+                        return retry;
+                    } catch (retryErr) {
+                        console.warn('Retry to production failed', retryErr);
+                        // fall through to local fallbacks
+                    }
+                } else {
+                    return attempt;
                 }
             }
-            // If all endpoints fail, rethrow the original error
-            throw err;
+        } catch (err) {
+            // If the first attempt was aborted (timeout) assume possible cold start and retry with longer timeout
+            console.warn('Production endpoint attempt failed', err && err.name ? err.name : err);
+            if (err && err.name === 'AbortError') {
+                try {
+                    const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
+                    return retry;
+                } catch (retryErr) {
+                    console.warn('Extended timeout retry failed', retryErr);
+                }
+            }
         }
+
+        // If production failed or retry didn't help, try local fallbacks (useful for dev)
+        for (const ep of LOCAL_ENDPOINTS) {
+            try {
+                const resp = await postJSON(ep, payload, 15000);
+                return resp;
+            } catch (e) {
+                console.warn('Fallback endpoint failed:', ep, e);
+            }
+        }
+
+        // If all endpoints fail, throw to be handled by caller
+        throw new Error('All mail endpoints failed');
     }
 
     // ========================================================
@@ -349,28 +379,35 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (endpoint && (endpoint.includes('formspree.io') || endpoint.toLowerCase().includes('formspree'))) {
                         // send to Formspree if explicitly configured
                         const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
-                        if (res && (res.status === 200 || res.status === 201)) {
+                        if (data && data.success === true) {
                             showFormResult(form, 'Enquiry sent successfully', true);
                             form.reset();
-                        } else if (res && res.status === 404) {
-                            console.error('Formspree 404', { endpoint, status: res.status, data, text });
-                            showFormResult(form, 'Form is temporarily unavailable. Please try again later.', false);
                         } else {
-                            console.error('Formspree submission failed', { endpoint, status: res && res.status, statusText: res && res.statusText, data, text });
-                            if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
+                            // prefer backend-provided message when available
+                            const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
+                            console.error('Formspree submission issue', { endpoint, status: res && res.status, statusText: res && res.statusText, data, text });
+                            if (backendMsg) showFormResult(form, backendMsg, false);
+                            else if (res && res.status === 404) showFormResult(form, 'Form is temporarily unavailable. Please try again later.', false);
+                            else if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
                             else showFormResult(form, 'Failed to send enquiry. Please check your details and try again.', false);
                         }
                     } else {
                         // default: use production Railway endpoint via sendMail
-                        const { res, data, text } = await sendMail(payload, 12000);
-                        if (res && res.ok) {
-                            // treat OK responses as success for users; never surface backend internals
+                        const { res, data, text } = await sendMail(payload);
+                        if (data && data.success === true) {
                             showFormResult(form, 'Message sent successfully', true);
                             form.reset();
                         } else {
-                            console.error('SendMail failed', { status: res && res.status, statusText: res && res.statusText, data, text });
-                            if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
-                            else showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
+                            // backend returned a non-success payload or non-200 status
+                            const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
+                            console.error('SendMail returned non-success', { status: res && res.status, statusText: res && res.statusText, data, text });
+                            if (backendMsg) {
+                                showFormResult(form, backendMsg, false);
+                            } else if (res && res.status >= 500) {
+                                showFormResult(form, 'Server error. Please try again later.', false);
+                            } else {
+                                showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
+                            }
                         }
                     }
                 } catch (err) {
