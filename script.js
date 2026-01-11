@@ -353,29 +353,24 @@ document.addEventListener("DOMContentLoaded", () => {
                             showFormResult(form, 'Enquiry sent successfully', true);
                             form.reset();
                         } else if (res && res.status === 404) {
-                            showFormResult(form, 'Form not found — check your Formspree ID', false);
+                            console.error('Formspree 404', { endpoint, status: res.status, data, text });
+                            showFormResult(form, 'Form is temporarily unavailable. Please try again later.', false);
                         } else {
-                            const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
-                            showFormResult(form, errMsg, false);
+                            console.error('Formspree submission failed', { endpoint, status: res && res.status, statusText: res && res.statusText, data, text });
+                            if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
+                            else showFormResult(form, 'Failed to send enquiry. Please check your details and try again.', false);
                         }
                     } else {
                         // default: use production Railway endpoint via sendMail
                         const { res, data, text } = await sendMail(payload, 12000);
                         if (res && res.ok) {
-                            // success if backend marks success or returns message
-                            if (data && (data.success || data.message)) {
-                                showFormResult(form, 'Message sent successfully', true);
-                                form.reset();
-                            } else if (data && data.error) {
-                                showFormResult(form, data.error, false);
-                            } else {
-                                // fallback: treat ok responses as success
-                                showFormResult(form, 'Message sent successfully', true);
-                                form.reset();
-                            }
+                            // treat OK responses as success for users; never surface backend internals
+                            showFormResult(form, 'Message sent successfully', true);
+                            form.reset();
                         } else {
-                            const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) || text || 'Failed to send';
-                            showFormResult(form, errMsg, false);
+                            console.error('SendMail failed', { status: res && res.status, statusText: res && res.statusText, data, text });
+                            if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
+                            else showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
                         }
                     }
                 } catch (err) {
@@ -397,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return await postJSON(url, payload, timeout);
     }
 
-    // HELPER: show form result (inline)
+    // HELPER: show form result (inline) — sanitized for users, accessible
     function showFormResult(form, message, success) {
         let container = form.querySelector('.form-result');
         if (!container) {
@@ -407,7 +402,11 @@ document.addEventListener("DOMContentLoaded", () => {
             container.style.marginTop = '12px';
             form.appendChild(container);
         }
-        container.textContent = message;
+        // ensure only plain text is displayed (avoid rendering HTML or backend traces)
+        container.textContent = String(message || '').trim();
+        container.setAttribute('role', 'status');
+        container.classList.remove('form-result-success', 'form-result-error');
+        container.classList.add(success ? 'form-result-success' : 'form-result-error');
         container.style.color = success ? '#0a7a0a' : '#b71c1c';
     }
 
