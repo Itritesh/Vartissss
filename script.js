@@ -223,29 +223,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // HELPER: POST JSON with timeout + CORS
+    // HELPER: POST JSON (no AbortController)
+    // Removed AbortController/timeouts to avoid premature aborts
+    // during Vercel cold starts and SMTP delays.
     // ========================================================
-    async function postJSON(url, payload, timeout = 10000) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
+    async function postJSON(url, payload) {
         try {
             const res = await fetch(url, {
                 method: 'POST',
-                mode: 'cors',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(payload),
-                signal: controller.signal
+                body: JSON.stringify(payload)
             });
-            clearTimeout(id);
             const text = await res.text();
             let data = null;
             try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
             return { res, data, text };
         } catch (err) {
-            clearTimeout(id);
             throw err;
         }
     }
@@ -264,189 +259,99 @@ document.addEventListener("DOMContentLoaded", () => {
             '/send-mail'
         ];
 
-        // Try prod first, with a retry for Railway cold starts (longer timeout)
+        // Try prod first, then fall back to local endpoints to aid local development
         try {
-            // first attempt - moderate timeout
-            let attempt = await postJSON(PROD_ENDPOINT, payload, 15000);
-            // if we received a response, return it (caller will inspect data.success)
-            if (attempt && attempt.res) {
-                // if server error (5xx) attempt one retry with extended timeout
-                if (!attempt.res.ok && attempt.res.status >= 500) {
-                    console.warn('Production endpoint returned server error, retrying with extended timeout', attempt.res.status);
-                    try {
-                        await new Promise(r => setTimeout(r, 1200));
-                        const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
-                        return retry;
-                    } catch (retryErr) {
-                        console.warn('Retry to production failed', retryErr);
-                        // fall through to local fallbacks
-                    }
-                } else {
-                    return attempt;
-                }
-            }
+            return await postJSON(PROD_ENDPOINT, payload);
         } catch (err) {
-            // If the first attempt was aborted (timeout) assume possible cold start and retry with longer timeout
-            console.warn('Production endpoint attempt failed', err && err.name ? err.name : err);
-            if (err && err.name === 'AbortError') {
+            console.warn('Prod endpoint failed, attempting local fallbacks', err);
+            for (const ep of LOCAL_ENDPOINTS) {
                 try {
-                    const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
-                    return retry;
-                } catch (retryErr) {
-                    console.warn('Extended timeout retry failed', retryErr);
+                    const resp = await postJSON(ep, payload);
+                    return resp;
+                } catch (e) {
+                    console.warn('Fallback endpoint failed:', ep, e);
                 }
             }
+            // If all endpoints fail, rethrow the original error
+            throw err;
         }
-
-        // If production failed or retry didn't help, try local fallbacks (useful for dev)
-        for (const ep of LOCAL_ENDPOINTS) {
-            try {
-                const resp = await postJSON(ep, payload, 15000);
-                return resp;
-            } catch (e) {
-                console.warn('Fallback endpoint failed:', ep, e);
-            }
-        }
-
-        // If all endpoints fail, throw to be handled by caller
-        throw new Error('All mail endpoints failed');
     }
 
-    // ========================================================
-    // FORMS: unified handlers (single listener per form, normalizes payload)
-    // ========================================================
-    (function attachUnifiedFormHandlers() {
-        const forms = document.querySelectorAll('form.hero-form, form#contactForm');
+
+
+    // Attach submit listeners to ALL forms safely
+    (function attachAllForms() {
+        const forms = document.querySelectorAll('form');
         if (!forms || forms.length === 0) return;
 
-        function normalizeFieldValue(v) {
-            if (v === null || typeof v === 'undefined') return '';
-            const s = v.toString().trim();
-            if (!s) return '';
-            const lower = s.toLowerCase();
-            if (lower === 'select' || lower === 'choose' || lower === 'select an option' || lower === 'please select') return '';
-            return s;
-        }
-
         forms.forEach(form => {
-            if (form.dataset.unifiedHandlerAttached) return;
-            form.dataset.unifiedHandlerAttached = '1';
+            // prevent double-binding
+            if (form.dataset.handlerAttached === '1') return;
+            form.dataset.handlerAttached = '1';
+
+            // per-form in-flight guard to prevent duplicate POSTs
+            form.dataset.sending = '0';
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Prevent re-entrancy/double submissions
-                if (form.dataset.submitting === '1') return;
-                form.dataset.submitting = '1';
-
-                const submitBtn = form.querySelector("button[type='submit']");
-                const originalText = submitBtn ? submitBtn.innerText : null;
-                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; submitBtn.setAttribute('aria-busy', 'true'); }
-
-                const formData = new FormData(form);
-
-                // honeypot
-                const honey = normalizeFieldValue(formData.get('_gotcha'));
-                if (honey) {
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
-                    form.dataset.submitting = '0';
-                    showFormResult(form, 'Message sent successfully', true);
-                    form.reset();
+                if (form.dataset.sending === '1') {
+                    // already sending, ignore duplicate submit
                     return;
                 }
+                form.dataset.sending = '1';
 
-                const source = (form.id === 'contactForm' || window.location.pathname.includes('contact')) ? 'contact' : 'index';
-                const payload = {
-                    name: normalizeFieldValue(formData.get('name')),
-                    email: normalizeFieldValue(formData.get('email')),
-                    phone: normalizeFieldValue(formData.get('phone')),
-                    message: normalizeFieldValue(formData.get('message')),
-                    source
-                };
-
-                // Basic client-side required check for contact form only
-                if (form.id === 'contactForm') {
-                    if (!payload.name || !payload.email || !payload.message) {
-                        showFormResult(form, 'Please fill in your name, email, and message.', false);
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
-                        form.dataset.submitting = '0';
-                        return;
-                    }
-                }
+                const submitBtn = form.querySelector("button[type='submit']");
+                const originalText = submitBtn ? submitBtn.innerText : '';
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; }
 
                 try {
-                    const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
-                    if (endpoint && (endpoint.includes('formspree.io') || endpoint.toLowerCase().includes('formspree'))) {
-                        // send to Formspree if explicitly configured
-                        const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
-                        if (data && data.success === true) {
-                            showFormResult(form, 'Enquiry sent successfully', true);
-                            form.reset();
-                        } else {
-                            // prefer backend-provided message when available
-                            const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
-                            console.error('Formspree submission issue', { endpoint, status: res && res.status, statusText: res && res.statusText, data, text });
-                            if (backendMsg) showFormResult(form, backendMsg, false);
-                            else if (res && res.status === 404) showFormResult(form, 'Form is temporarily unavailable. Please try again later.', false);
-                            else if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
-                            else showFormResult(form, 'Failed to send enquiry. Please check your details and try again.', false);
-                        }
+                    const formData = new FormData(form);
+
+                    // Normalize payload to the exact schema required
+                    const getVal = (key) => {
+                        const v = formData.get(key);
+                        if (v === null) return '';
+                        const s = v.toString().trim();
+                        // treat placeholder-like values as empty
+                        if (s === '' || s.toLowerCase() === 'select' || s.toLowerCase() === 'please select' || s.toLowerCase() === 'choose') return '';
+                        return s;
+                    };
+
+                    const payload = {
+                        name: getVal('name'),
+                        email: getVal('email'),
+                        phone: getVal('phone'),
+                        message: getVal('message'),
+                        source: (form.id && form.id.toLowerCase().includes('contact')) || window.location.pathname.toLowerCase().includes('contact') ? 'contact' : 'index'
+                    };
+
+                    const { res, data, text } = await sendMail(payload);
+
+                    // Successful send
+                    if (res && res.ok && data && (data.success === true || data.success === 'true')) {
+                        if (submitBtn) submitBtn.innerText = 'Sent';
+                        try { form.reset(); } catch (e) { /* ignore reset errors */ }
                     } else {
-                        // default: use production Railway endpoint via sendMail
-                        const { res, data, text } = await sendMail(payload);
-                        if (data && data.success === true) {
-                            showFormResult(form, 'Message sent successfully', true);
-                            form.reset();
-                        } else {
-                            // backend returned a non-success payload or non-200 status
-                            const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
-                            console.error('SendMail returned non-success', { status: res && res.status, statusText: res && res.statusText, data, text });
-                            if (backendMsg) {
-                                showFormResult(form, backendMsg, false);
-                            } else if (res && res.status >= 500) {
-                                showFormResult(form, 'Server error. Please try again later.', false);
-                            } else {
-                                showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
-                            }
-                        }
+                        const errMsg = (data && (data.error || data.message)) ? (data.error || data.message) : (res && res.statusText) ? res.statusText : (res ? `Server error (${res.status})` : (text || 'Failed to send'));
+                        console.error('Email send failed:', errMsg, { res, data, text });
+                        if (submitBtn) submitBtn.innerText = 'Error';
+                        if (submitBtn && errMsg) submitBtn.title = String(errMsg);
                     }
                 } catch (err) {
-                    console.error('Submission network error', err);
-                    if (err && err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
-                    else showFormResult(form, 'Network error. Please try again later.', false);
+                    console.error('Send-mail network error', err);
+                    if (submitBtn) submitBtn.innerText = 'Network Error';
+                    if (submitBtn) submitBtn.title = err && err.message ? err.message : 'Network error';
                 } finally {
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
-                    form.dataset.submitting = '0';
+                    // restore button state after short delay so user sees status
+                    setTimeout(() => {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalText; submitBtn.title = ''; }
+                        form.dataset.sending = '0';
+                    }, 1200);
                 }
             });
         });
     })();
-
-    // ========================================================
-    // HELPER: Formspree submission (replaces backend dependency)
-    // ========================================================
-    async function submitToFormspree(url, payload, timeout = 12000) {
-        return await postJSON(url, payload, timeout);
-    }
-
-    // HELPER: show form result (inline) — sanitized for users, accessible
-    function showFormResult(form, message, success) {
-        let container = form.querySelector('.form-result');
-        if (!container) {
-            container = document.createElement('div');
-            container.className = 'form-result';
-            container.setAttribute('aria-live', 'polite');
-            container.style.marginTop = '12px';
-            form.appendChild(container);
-        }
-        // ensure only plain text is displayed (avoid rendering HTML or backend traces)
-        container.textContent = String(message || '').trim();
-        container.setAttribute('role', 'status');
-        container.classList.remove('form-result-success', 'form-result-error');
-        container.classList.add(success ? 'form-result-success' : 'form-result-error');
-        container.style.color = success ? '#0a7a0a' : '#b71c1c';
-    }
-
 
 
 });
