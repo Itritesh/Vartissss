@@ -123,8 +123,14 @@ body {
     color: var(--text-main); text-decoration: none; font-size: 0.9rem; 
     text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
     transition: color 0.3s;
+    position: relative;
 }
 .nav-links a:hover { color: var(--accent); }
+.nav-links a.active { 
+    color: var(--accent); 
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 4px;
+}
 
 .theme-btn {
     background: none; border: 1px solid var(--line); color: var(--text-main);
@@ -293,8 +299,13 @@ section { padding: 120px 5% 80px; position: relative; border-bottom: 1px solid v
 
 footer { padding: 50px 5%; background: var(--bg-card); text-align: center; color: var(--text-muted); border-top: 1px solid var(--line); }
 .footer-links { margin-top: 20px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-.footer-links a { color: var(--text-main); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+.footer-links a { color: var(--text-main); text-decoration: none; font-size: 0.9rem; transition: 0.3s; position: relative; }
 .footer-links a:hover { color: var(--accent); }
+.footer-links a.active { 
+    color: var(--accent); 
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 4px;
+}
 
 /* =========================================
    8. RESPONSIVE & MOBILE
