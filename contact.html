@@ -68,14 +68,19 @@
             </div>
             <div class="hero-form-container" style="width: 100%; max-width: 600px; margin: 60px auto 0;" data-scroll
                 data-scroll-speed="0.4">
-                <form class="hero-form" id="contactForm">
+                <form class="hero-form" id="contactForm" novalidate>
+                    <input type="text" name="_gotcha"
+                        style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;"
+                        tabindex="-1" aria-hidden="true">
+
                     <div class="form-group"><input type="text" name="name" placeholder="Full Name" required></div>
                     <div class="form-group"><input type="email" name="email" placeholder="Business Email" required>
                     </div>
-                    <div class="form-group"><input type="tel" name="phone" placeholder="Phone Number" required></div>
-                    <div class="form-group"><textarea name="message" rows="5"
-                            placeholder="Project Details..."></textarea></div>
+                    <div class="form-group"><input type="tel" name="phone" placeholder="Phone Number"></div>
+                    <div class="form-group"><textarea name="message" rows="5" placeholder="Project Details..."
+                            required></textarea></div>
                     <button type="submit" class="btn-submit">Submit Enquiry</button>
+                    <div class="form-result" aria-live="polite" style="margin-top:12px;"></div>
                 </form>
             </div>
         </section>
@@ -95,11 +100,9 @@
                     <a href="team.html">The Squad</a>
                     <a href="contact.html">Contact</a>
                 </div>
-                 <div class="footer-socials">
-                      <a href="https://www.linkedin.com/company/vartisticstudio/?viewAsMember=true" target="_blank"
-                        rel="noopener noreferrer">LinkedIn</a>
-                    <a href="https://www.instagram.com/vartisticstudio" target="_blank"
-                        rel="noopener noreferrer">Instagram</a>
+                <div class="footer-socials">
+                    <a href="#">LinkedIn</a>
+                    <a href="#">Instagram</a>
                     <a href="#">Twitter</a>
                 </div>
             </div>
@@ -111,6 +114,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="script.js"></script>
+    <!-- Form submission logic consolidated into script.js -->
 </body>
 
 </html>
