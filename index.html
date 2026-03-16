@@ -49,22 +49,20 @@
     </div>
 
     <nav class="navbar">
-        <div class="nav-container">
-            <a href="#home" class="logo">Vartistic<span>.</span></a>
-            <div class="nav-right">
-                <ul class="nav-links">
-                    <li><a href="#home" data-scroll-to class="active">Home</a></li>
-                    <li><a href="about.html">Our Work</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="team.html">The Squad</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-                <button class="theme-btn"><span>☀️</span> Mode</button>
-                <button class="hamburger">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </button>
+        <div class="logo">Vartistic<span>.</span></div>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="#home" data-scroll-to class="active">Home</a></li>
+                <li><a href="about.html">Our Work</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="team.html">The Squad</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button class="theme-btn"><span>☀️</span> Mode</button>
+            <div class="hamburger">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
             </div>
         </div>
     </nav>
@@ -74,249 +72,285 @@
         <header class="hero" id="home" data-scroll-section>
             <div class="hero-bg"></div>
 
-            <div class="drag-object" data-scroll data-scroll-speed="2" style="top: 55%; left: 42%;">
-                <span class="drag-instruction">Drag Me</span>
-            </div>
-
-            <div class="drag-object mobile-orb" style="top: 18%; left: 8%; opacity: 0.75;" aria-hidden="true"></div>
-
-            <div class="hero-content-wrapper" data-scroll data-scroll-speed="1">
-                <div class="hero-content">
-                    <div class="hero-badge">✨ Next Generation Solutions</div>
-                    <h1>Crafting Digital <span class="text-gradient">Excellence.</span></h1>
-                    <p>We are a full-service development agency. We build <strong>Custom Websites</strong>, edit <strong>HTML Templates</strong>, create <strong>Pixel-Perfect Replicas</strong>, and build <strong>Python Tools</strong>. From problem-solving to rapid "Vibe Coding," we deliver results.</p>
-                    <div class="hero-cta">
-                        <a href="services.html" class="cta-btn primary">View All Services</a>
-                        <a href="about.html" class="cta-btn secondary">See Our Work</a>
+            <div class="hero-container">
+                <div class="hero-left">
+                    <h1>Professional Web Solutions For <span class="accent-text">Your Business</span></h1>
+                    <p class="hero-description">Custom websites, redesigns, template editing, and automation tools tailored to your needs. We deliver quality code and real results.</p>
+                    
+                    <div class="hero-cta-group">
+                        <a href="services.html" class="cta-btn primary">Explore Services</a>
+                        <a href="contact.html" class="cta-btn secondary">Request Consultation</a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">100%</span>
+                            <span class="stat-label">Custom Code</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">Fast</span>
+                            <span class="stat-label">Delivery</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">SEO</span>
+                            <span class="stat-label">Optimized</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="hero-form-container" data-scroll data-scroll-speed="1.5">
-                    <form class="hero-form" novalidate>
-                        <h3>Start Your Project</h3>
+                <div class="hero-right">
+                    <div class="form-card">
+                        <h3>Get Started Today</h3>
+                        <p class="form-subtitle">Tell us about your project</p>
 
-                        <input type="text" name="_gotcha" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;" tabindex="-1" aria-hidden="true">
+                        <form class="hero-form" novalidate>
+                            <input type="text" name="_gotcha"
+                                style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;"
+                                tabindex="-1" aria-hidden="true">
 
-                        <div class="form-group"><input type="text" name="name" placeholder="Your Name" required /></div>
-                        <div class="form-group"><input type="email" name="email" placeholder="Your Email" required /></div>
-                        <div class="form-group"><input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required /></div>
-                        <div class="form-group">
-                            <select name="message" required>
-                                <option value="">What do you need?</option>
-                                <option>Build from Scratch</option>
-                                <option>Template Editing</option>
-                                <option>Website Replica/Clone</option>
-                                <option>Redesign & Fixes</option>
-                                <option>Python Automation</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-submit">Let's Talk</button>
-                        <div class="form-result" aria-live="polite" style="margin-top:12px;"></div>
-                    </form>
+                            <div class="form-group">
+                                <label for="name">Your Name</label>
+                                <input type="text" id="name" name="name" placeholder="John Doe" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="(555) 000-0000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="service">What do you need?</label>
+                                <select id="service" name="message" required>
+                                    <option value="">Select a service</option>
+                                    <option>Build from Scratch</option>
+                                    <option>Template Editing</option>
+                                    <option>Website Replica/Clone</option>
+                                    <option>Redesign & Fixes</option>
+                                    <option>Python Automation</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn-submit">Send Request</button>
+                            <div class="form-result" aria-live="polite"></div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- SERVICES SECTION -->
-        <section id="services" data-scroll-section>
+        <section class="services-section" data-scroll-section>
             <div class="section-container">
                 <div class="section-header">
-                    <div class="section-badge">Our Expertise</div>
-                    <h2 class="section-title">Comprehensive <span class="text-gradient">Solutions</span></h2>
-                    <p class="section-description">Full-service development with a focus on quality, speed, and real results.</p>
+                    <h2>Our Services</h2>
+                    <p>Complete solutions for your web development needs</p>
                 </div>
 
-                <div class="service-list">
-                    <!-- Service 01 -->
-                    <div class="service-item" data-scroll data-scroll-speed="0.9">
-                        <div class="service-info">
-                            <h3>Build & Redesign</h3>
-                            <p>We build websites from scratch or modernize existing ones. We focus on clean code, SEO rankings, and high performance to ensure your business stands out.</p>
-                            <div class="service-tags">
-                                <span>Custom Development</span>
-                                <span>SEO Optimized</span>
-                                <span>High Performance</span>
-                            </div>
-                        </div>
-                        <div style="color: var(--text-muted); font-size: 2.5rem;">→</div>
+                <div class="services-grid">
+                    <!-- Service 1 -->
+                    <div class="service-item" data-scroll data-scroll-speed="0.8">
+                        <div class="service-number">01</div>
+                        <h3>Custom Website Development</h3>
+                        <p>Build professional websites from scratch with clean, optimized code. SEO-friendly, fast-loading, and designed for conversions.</p>
+                        <a href="services.html" class="service-link">Learn More →</a>
                     </div>
 
-                    <!-- Service 02 -->
-                    <div class="service-item" data-scroll data-scroll-speed="0.7">
-                        <div class="service-info">
-                            <h3>Template Edits & Replicas</h3>
-                            <p>Got a template? We edit it to perfection. Want a pixel-perfect clone? We replicate any website with clean code. We also offer "Vibe Coding" for super-fast delivery.</p>
-                            <div class="service-tags">
-                                <span>Template Editing</span>
-                                <span>Website Cloning</span>
-                                <span>Vibe Coding</span>
-                            </div>
-                        </div>
-                        <div style="color: var(--text-muted); font-size: 2.5rem;">→</div>
+                    <!-- Service 2 -->
+                    <div class="service-item" data-scroll data-scroll-speed="0.8">
+                        <div class="service-number">02</div>
+                        <h3>Template Editing & Redesigns</h3>
+                        <p>Customize your existing templates or give your website a complete makeover. We modernize outdated designs and improve performance.</p>
+                        <a href="services.html" class="service-link">Learn More →</a>
                     </div>
 
-                    <!-- Service 03 -->
-                    <div class="service-item" data-scroll data-scroll-speed="0.5">
-                        <div class="service-info">
-                            <h3>Tools & Maintenance</h3>
-                            <p>We fix bugs, maintain your sites, and build Python automation tools (like our Auto-Mailer) to solve real business problems and boost efficiency.</p>
-                            <div class="service-tags">
-                                <span>Maintenance</span>
-                                <span>Python Tools</span>
-                                <span>Automation</span>
-                            </div>
-                        </div>
-                        <div style="color: var(--text-muted); font-size: 2.5rem;">→</div>
+                    <!-- Service 3 -->
+                    <div class="service-item" data-scroll data-scroll-speed="0.8">
+                        <div class="service-number">03</div>
+                        <h3>Website Cloning & Replicas</h3>
+                        <p>Need an exact replica or inspired version of a design? We create pixel-perfect clones with your own custom functionality.</p>
+                        <a href="services.html" class="service-link">Learn More →</a>
+                    </div>
+
+                    <!-- Service 4 -->
+                    <div class="service-item" data-scroll data-scroll-speed="0.8">
+                        <div class="service-number">04</div>
+                        <h3>Python Automation Tools</h3>
+                        <p>Automate repetitive tasks with custom Python tools. From email automation to data processing—save time and increase efficiency.</p>
+                        <a href="services.html" class="service-link">Learn More →</a>
+                    </div>
+
+                    <!-- Service 5 -->
+                    <div class="service-item" data-scroll data-scroll-speed="0.8">
+                        <div class="service-number">05</div>
+                        <h3>Maintenance & Support</h3>
+                        <p>Keep your site running smoothly with ongoing support. Bug fixes, updates, security patches, and technical maintenance included.</p>
+                        <a href="services.html" class="service-link">Learn More →</a>
+                    </div>
+
+                    <!-- Service 6 -->
+                    <div class="service-item" data-scroll data-scroll-speed="0.8">
+                        <div class="service-number">06</div>
+                        <h3>Rapid Development</h3>
+                        <p>Need something fast? Our streamlined process gets high-quality sites live quickly—without sacrificing quality or SEO.</p>
+                        <a href="services.html" class="service-link">Learn More →</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ABOUT SECTION -->
-        <section id="about" data-scroll-section>
+        <section class="benefits-section" data-scroll-section>
             <div class="section-container">
                 <div class="section-header">
-                    <div class="section-badge">Why Choose Us</div>
-                    <h2 class="section-title">Why <span class="text-gradient">Vartistic?</span></h2>
-                    <p class="section-description">We combine technical excellence with creative vision to deliver outstanding results.</p>
+                    <h2>Why Choose Vartistic?</h2>
+                    <p>What sets us apart in the industry</p>
                 </div>
 
-                <div class="work-grid">
-                    <div class="work-card" data-scroll data-scroll-speed="0.9">
-                        <div class="work-info">
-                            <h4>Full Code Control</h4>
-                            <p>We don't use builders. Whether it's a scratch build, a replica, or a template edit, we write the code directly. This guarantees better customization and speed.</p>
-                            <div class="service-tags" style="margin-top: var(--space-lg);">
-                                <span>HTML/CSS</span>
-                                <span>Python</span>
-                                <span>No CMS</span>
-                            </div>
-                        </div>
+                <div class="benefits-grid">
+                    <div class="benefit-card" data-scroll data-scroll-speed="0.8">
+                        <div class="benefit-icon">✓</div>
+                        <h3>100% Custom Code</h3>
+                        <p>No page builders. No templates. We write clean, optimized code from scratch for complete control and flexibility.</p>
                     </div>
 
-                    <div class="work-card" data-scroll data-scroll-speed="0.7">
-                        <div class="work-info">
-                            <h4>SEO & Ranking</h4>
-                            <p>Everything we do—from custom builds to replicas—is optimized for search engines. We structure your site specifically to help you rank at the top.</p>
-                            <div class="service-tags" style="margin-top: var(--space-lg);">
-                                <span>SEO</span>
-                                <span>Ranking</span>
-                                <span>Traffic</span>
-                            </div>
-                        </div>
+                    <div class="benefit-card" data-scroll data-scroll-speed="0.8">
+                        <div class="benefit-icon">✓</div>
+                        <h3>SEO Optimized</h3>
+                        <p>Every project is built with search engines in mind. Better rankings, more visibility, more organic traffic.</p>
                     </div>
 
-                    <div class="work-card" data-scroll data-scroll-speed="0.5">
-                        <div class="work-info">
-                            <h4>Problem Solvers</h4>
-                            <p>We build tools for the real world. Our Python Auto-Mailer is proof we can automate your business. We are currently building even bigger tools for the future.</p>
-                            <div class="service-tags" style="margin-top: var(--space-lg);">
-                                <span>Automation</span>
-                                <span>Logic</span>
-                                <span>Tools</span>
-                            </div>
-                        </div>
+                    <div class="benefit-card" data-scroll data-scroll-speed="0.8">
+                        <div class="benefit-icon">✓</div>
+                        <h3>Fast Turnaround</h3>
+                        <p>Get your project live quickly without compromise. Our streamlined process keeps things moving.</p>
+                    </div>
+
+                    <div class="benefit-card" data-scroll data-scroll-speed="0.8">
+                        <div class="benefit-icon">✓</div>
+                        <h3>Professional Support</h3>
+                        <p>Ongoing maintenance and support to keep your site running smoothly. We're here when you need us.</p>
+                    </div>
+
+                    <div class="benefit-card" data-scroll data-scroll-speed="0.8">
+                        <div class="benefit-icon">✓</div>
+                        <h3>Real Solutions</h3>
+                        <p>Beyond websites—we build Python tools and automation systems to solve real business problems.</p>
+                    </div>
+
+                    <div class="benefit-card" data-scroll data-scroll-speed="0.8">
+                        <div class="benefit-icon">✓</div>
+                        <h3>Transparent Process</h3>
+                        <p>Clear communication, realistic timelines, and honest pricing. No surprises, just results.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FAQ SECTION -->
-        <section id="faq" data-scroll-section>
+        <section class="faq-section" data-scroll-section>
             <div class="section-container">
                 <div class="section-header">
-                    <div class="section-badge">FAQ</div>
-                    <h2 class="section-title">Frequently Asked <span class="text-gradient">Questions</span></h2>
-                    <p class="section-description">Everything you need to know about our services and process.</p>
+                    <h2>Frequently Asked Questions</h2>
                 </div>
 
-                <div class="faq-container">
-                    <div class="faq-item" data-scroll data-scroll-speed="0.9">
-                        <button class="faq-question">
-                            <span>Can you edit a template or clone a site?</span>
-                            <span>+</span>
+                <div class="faq-wrapper">
+                    <div class="faq-item" data-scroll data-scroll-speed="0.8">
+                        <button class="faq-header">
+                            <span class="faq-title">How does your process work?</span>
+                            <span class="faq-toggle">+</span>
                         </button>
-                        <div class="faq-answer">
-                            <p>Yes! We offer HTML template editing and website replica services. We can make a site look exactly how you want it using clean code.</p>
+                        <div class="faq-body">
+                            <p>We start with a consultation to understand your needs, then provide a timeline and quote. Once approved, we build and deliver your project with regular updates along the way.</p>
                         </div>
                     </div>
 
-                    <div class="faq-item" data-scroll data-scroll-speed="0.7">
-                        <button class="faq-question">
-                            <span>What is "Vibe Coding"?</span>
-                            <span>+</span>
+                    <div class="faq-item" data-scroll data-scroll-speed="0.8">
+                        <button class="faq-header">
+                            <span class="faq-title">What makes your code better than page builders?</span>
+                            <span class="faq-toggle">+</span>
                         </button>
-                        <div class="faq-answer">
-                            <p>It is our fast-track service. If you need a landing page or simple site urgently, we use rapid coding techniques to deliver it in record time.</p>
+                        <div class="faq-body">
+                            <p>Custom code gives you complete control, faster load times, better SEO, and the ability to add unique features. No bloated templates or limitation.</p>
                         </div>
                     </div>
 
-                    <div class="faq-item" data-scroll data-scroll-speed="0.5">
-                        <button class="faq-question">
-                            <span>Do you also do maintenance & automation?</span>
-                            <span>+</span>
+                    <div class="faq-item" data-scroll data-scroll-speed="0.8">
+                        <button class="faq-header">
+                            <span class="faq-title">Do you provide ongoing maintenance?</span>
+                            <span class="faq-toggle">+</span>
                         </button>
-                        <div class="faq-answer">
-                            <p>Yes. We fix bugs, update sites, and build Python tools (like bulk mailers) to solve real-life efficiency problems.</p>
+                        <div class="faq-body">
+                            <p>Yes. We offer ongoing support packages including security updates, bug fixes, performance optimization, and new feature development.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-scroll data-scroll-speed="0.8">
+                        <button class="faq-header">
+                            <span class="faq-title">Can you help with WordPress to custom conversion?</span>
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-body">
+                            <p>Absolutely. We can migrate your WordPress site, redesign it, and convert it to custom code for better performance and control.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-scroll data-scroll-speed="0.8">
+                        <button class="faq-header">
+                            <span class="faq-title">How long does a typical project take?</span>
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-body">
+                            <p>Timeline depends on scope. Simple landing pages: 1-2 weeks. Full websites: 3-8 weeks. Custom tools: varies. We'll give you a realistic estimate during consultation.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-scroll data-scroll-speed="0.8">
+                        <button class="faq-header">
+                            <span class="faq-title">Will my site be mobile-friendly?</span>
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-body">
+                            <p>Every site we build is fully responsive and optimized for mobile devices. Mobile-first design is standard practice for us.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <button class="back-to-top">↑</button>
-
-        <!-- CTA SECTION -->
-        <section data-scroll-section style="background: var(--gradient-primary); color: white; padding: var(--space-4xl) 0;">
-            <div class="section-container" data-scroll data-scroll-speed="1">
-                <div style="text-align: center; max-width: 800px; margin: 0 auto;">
-                    <div class="section-badge" style="background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); color: white;">Ready to Get Started?</div>
-                    <h2 class="section-title" style="color: white; margin-bottom: var(--space-lg);">Need a Solution?</h2>
-                    <p class="section-description" style="color: rgba(255, 255, 255, 0.9); margin-bottom: var(--space-2xl);">From custom websites to automation tools. Let's build something amazing together.</p>
-                    <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
-                        <a href="contact.html" class="cta-btn primary">Get Started</a>
-                        <a href="services.html" class="cta-btn secondary" style="border-color: rgba(255, 255, 255, 0.3); color: white;">View Services</a>
-                    </div>
+        <section class="cta-section" data-scroll-section>
+            <div class="section-container">
+                <div class="cta-content">
+                    <h2>Ready to Start Your Project?</h2>
+                    <p>Let's discuss how we can help your business grow online.</p>
+                    <a href="contact.html" class="cta-btn primary">Contact Us Today</a>
                 </div>
             </div>
         </section>
 
-        <!-- FOOTER -->
         <footer data-scroll-section>
             <div class="footer-content">
                 <div class="footer-brand">
-                    <h3>Vartistic Studio<span class="text-gradient">.</span></h3>
+                    <h3>Vartistic Studio.</h3>
                     <p>Fast Code. Real Results.</p>
                 </div>
                 <div class="footer-links">
-                    <div>
-                        <h4>Company</h4>
-                        <ul>
-                            <li><a href="index.html">Home</a></li>
-                            <li><a href="about.html">Our Work</a></li>
-                            <li><a href="contact.html">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4>Services</h4>
-                        <ul>
-                            <li><a href="services.html">Web Development</a></li>
-                            <li><a href="services.html">Template Editing</a></li>
-                            <li><a href="services.html">Python Tools</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4>Resources</h4>
-                        <ul>
-                            <li><a href="team.html">The Squad</a></li>
-                            <li><a href="privacy-policy.html">Privacy</a></li>
-                            <li><a href="terms.html">Terms</a></li>
-                        </ul>
-                    </div>
+                    <a href="index.html" class="active">Home</a>
+                    <a href="about.html">Our Work</a>
+                    <a href="services.html">Services</a>
+                    <a href="team.html">The Squad</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-socials">
+                    <a href="https://www.linkedin.com/company/vartisticstudio/?viewAsMember=true" target="_blank"
+                        rel="noopener noreferrer">LinkedIn</a>
+                    <a href="https://www.instagram.com/vartisticstudio" target="_blank"
+                        rel="noopener noreferrer">Instagram</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Vartistic Studio. All Rights Reserved. | <a href="https://www.linkedin.com/company/vartisticstudio/?viewAsMember=true" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">LinkedIn</a> &nbsp;•&nbsp; <a href="https://www.instagram.com/vartisticstudio" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Instagram</a></p>
+                <p>&copy; 2026 Vartistic Studio. All Rights Reserved.</p>
             </div>
         </footer>
 
