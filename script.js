@@ -446,7 +446,42 @@ document.addEventListener("DOMContentLoaded", () => {
         container.classList.add(success ? 'form-result-success' : 'form-result-error');
         container.style.color = success ? '#0a7a0a' : '#b71c1c';
     }
+    // ========================================================
+    // PAGE ANIMATIONS — scroll-triggered via IntersectionObserver
+    // ========================================================
+    (function initPageAnimations() {
+        const staggerGroups = [
+            { selector: '.v-svc-card', stagger: 100 },
+            { selector: '.v-stat-block', stagger: 120 },
+            { selector: '.v-point', stagger: 100 },
+            { selector: '.v-faq-item', stagger: 80 },
+            { selector: '.v-section-label', stagger: 0 },
+            { selector: '.v-cta-band h2', stagger: 0 },
+            { selector: '.v-cta-band p', stagger: 80 },
+            { selector: '.v-cta-row-center', stagger: 160 },
+        ];
 
+        staggerGroups.forEach(({ selector, stagger }) => {
+            const els = document.querySelectorAll(selector);
+            if (!els.length) return;
+
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // find index among siblings for stagger
+                        const all = [...els];
+                        const idx = all.indexOf(entry.target);
+                        setTimeout(() => {
+                            entry.target.classList.add('is-visible');
+                        }, idx * stagger);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            els.forEach(el => obs.observe(el));
+        });
+    })();
 
 
 });
