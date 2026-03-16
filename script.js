@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 preloader.style.display = 'none';
                 if (locoScroll) locoScroll.update();
-                if (typeof animateServiceHeader === 'function') animateServiceHeader();
+                animateServiceHeader();
             }, 500);
         }, 1800);
     }
@@ -83,12 +83,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!backdrop) {
             backdrop = document.createElement('div');
             backdrop.id = 'nav-backdrop';
-            backdrop.style.cssText = `
-                position: fixed; inset: 0; z-index: 1000;
-                background: rgba(0,0,0,0.45);
-                opacity: 0; pointer-events: none;
-                transition: opacity 0.3s ease;
-            `;
+            backdrop.style.cssText = [
+                'position:fixed',
+                'inset:0',
+                'z-index:1000',
+                'background:rgba(0,0,0,0.5)',
+                'opacity:0',
+                'pointer-events:none',
+                'transition:opacity 0.3s ease',
+                'backdrop-filter:blur(2px)',
+                '-webkit-backdrop-filter:blur(2px)'
+            ].join(';');
             document.body.appendChild(backdrop);
         }
 
@@ -108,7 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.style.overflow = '';
         };
 
-        hamburger.addEventListener('click', () => {
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
             navLinks.classList.contains('active') ? closeMenu() : openMenu();
         });
 
@@ -116,9 +122,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         links.forEach(link => {
             link.addEventListener('click', (e) => {
-                closeMenu();
                 const anchor = link.querySelector('a');
                 const targetId = anchor ? anchor.getAttribute('href') : null;
+                closeMenu();
                 if (targetId && targetId.startsWith('#') && locoScroll) {
                     e.preventDefault();
                     const targetEl = document.querySelector(targetId);
@@ -273,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const filledText = document.querySelector('.crazy-title .filled');
         const subtitle = document.querySelector('.crazy-subtitle');
         if (filledText) setTimeout(() => { filledText.style.width = '100%'; }, 300);
-        if (subtitle) gsap.to(subtitle, { opacity: 1, y: 0, duration: 1, delay: 1, ease: 'power2.out' });
+        if (subtitle && typeof gsap !== 'undefined') gsap.to(subtitle, { opacity: 1, y: 0, duration: 1, delay: 1, ease: 'power2.out' });
     }
 
     // ========================================================
@@ -286,10 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch(url, {
                 method: 'POST',
                 mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(payload),
                 signal: controller.signal
             });
@@ -316,14 +319,13 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
 
         try {
-            let attempt = await postJSON(PROD_ENDPOINT, payload, 15000);
+            const attempt = await postJSON(PROD_ENDPOINT, payload, 15000);
             if (attempt && attempt.res) {
                 if (!attempt.res.ok && attempt.res.status >= 500) {
-                    console.warn('Production endpoint returned server error, retrying...', attempt.res.status);
+                    console.warn('Production endpoint 5xx, retrying...', attempt.res.status);
                     try {
                         await new Promise(r => setTimeout(r, 1200));
-                        const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
-                        return retry;
+                        return await postJSON(PROD_ENDPOINT, payload, 30000);
                     } catch (retryErr) {
                         console.warn('Retry to production failed', retryErr);
                     }
@@ -332,24 +334,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         } catch (err) {
-            console.warn('Production endpoint attempt failed', err && err.name ? err.name : err);
+            console.warn('Production endpoint failed', err && err.name ? err.name : err);
             if (err && err.name === 'AbortError') {
-                try {
-                    const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
-                    return retry;
-                } catch (retryErr) {
-                    console.warn('Extended timeout retry failed', retryErr);
-                }
+                try { return await postJSON(PROD_ENDPOINT, payload, 30000); } catch (e) { console.warn('Extended retry failed', e); }
             }
         }
 
         for (const ep of LOCAL_ENDPOINTS) {
-            try {
-                const resp = await postJSON(ep, payload, 15000);
-                return resp;
-            } catch (e) {
-                console.warn('Fallback endpoint failed:', ep, e);
-            }
+            try { return await postJSON(ep, payload, 15000); } catch (e) { console.warn('Fallback failed:', ep, e); }
         }
 
         throw new Error('All mail endpoints failed');
@@ -367,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const s = v.toString().trim();
             if (!s) return '';
             const lower = s.toLowerCase();
-            if (lower === 'select' || lower === 'choose' || lower === 'select an option' || lower === 'please select') return '';
+            if (['select', 'choose', 'select an option', 'please select'].includes(lower)) return '';
             return s;
         }
 
@@ -382,16 +374,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const submitBtn = form.querySelector("button[type='submit']");
                 const originalText = submitBtn ? submitBtn.innerText : null;
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerText = 'Sending...';
-                    submitBtn.setAttribute('aria-busy', 'true');
-                }
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; submitBtn.setAttribute('aria-busy', 'true'); }
 
                 const formData = new FormData(form);
 
-                const honey = normalizeFieldValue(formData.get('_gotcha'));
-                if (honey) {
+                // Honeypot check
+                if (normalizeFieldValue(formData.get('_gotcha'))) {
                     if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
                     form.dataset.submitting = '0';
                     showFormResult(form, 'Message sent successfully', true);
@@ -419,34 +407,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 try {
                     const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
-                    if (endpoint && (endpoint.includes('formspree.io') || endpoint.toLowerCase().includes('formspree'))) {
-                        const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
-                        if (data && data.success === true) {
-                            showFormResult(form, 'Enquiry sent successfully', true);
-                            form.reset();
-                        } else {
-                            const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
-                            console.error('Formspree submission issue', { endpoint, status: res && res.status, data, text });
-                            if (backendMsg) showFormResult(form, backendMsg, false);
-                            else if (res && res.status === 404) showFormResult(form, 'Form is temporarily unavailable. Please try again later.', false);
-                            else if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
-                            else showFormResult(form, 'Failed to send enquiry. Please check your details and try again.', false);
+                    if (endpoint && endpoint.includes('formspree.io')) {
+                        const { res, data, text } = await postJSON(endpoint, payload, 12000);
+                        if (data && data.success === true) { showFormResult(form, 'Enquiry sent successfully', true); form.reset(); }
+                        else {
+                            const msg = data && (data.error || data.message) ? (data.error || data.message) : null;
+                            if (msg) showFormResult(form, msg, false);
+                            else if (res && res.status === 404) showFormResult(form, 'Form temporarily unavailable. Please try again.', false);
+                            else showFormResult(form, 'Failed to send enquiry. Please try again.', false);
                         }
                     } else {
-                        const { res, data, text } = await sendMail(payload);
-                        if (data && data.success === true) {
-                            showFormResult(form, 'Message sent successfully', true);
-                            form.reset();
-                        } else {
-                            const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
-                            console.error('SendMail returned non-success', { status: res && res.status, data, text });
-                            if (backendMsg) showFormResult(form, backendMsg, false);
+                        const { res, data } = await sendMail(payload);
+                        if (data && data.success === true) { showFormResult(form, 'Message sent successfully', true); form.reset(); }
+                        else {
+                            const msg = data && (data.error || data.message) ? (data.error || data.message) : null;
+                            if (msg) showFormResult(form, msg, false);
                             else if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
-                            else showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
+                            else showFormResult(form, 'Failed to send message. Please try again.', false);
                         }
                     }
                 } catch (err) {
-                    console.error('Submission network error', err);
+                    console.error('Submission error', err);
                     if (err && err.name === 'AbortError') showFormResult(form, 'Network timeout. Please try again.', false);
                     else showFormResult(form, 'Network error. Please try again later.', false);
                 } finally {
@@ -456,13 +437,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     })();
-
-    // ========================================================
-    // HELPER: Formspree submission
-    // ========================================================
-    async function submitToFormspree(url, payload, timeout = 12000) {
-        return await postJSON(url, payload, timeout);
-    }
 
     // ========================================================
     // HELPER: show form result
@@ -480,7 +454,9 @@ document.addEventListener("DOMContentLoaded", () => {
         container.setAttribute('role', 'status');
         container.classList.remove('form-result-success', 'form-result-error');
         container.classList.add(success ? 'form-result-success' : 'form-result-error');
-        container.style.color = success ? '#0a7a0a' : '#b71c1c';
+        container.style.color = success ? '#4caf50' : '#e53935';
+        container.style.fontSize = '0.88rem';
+        container.style.textAlign = 'center';
     }
 
     // ========================================================
@@ -505,11 +481,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const obs = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const all = [...els];
-                        const idx = all.indexOf(entry.target);
-                        setTimeout(() => {
-                            entry.target.classList.add('is-visible');
-                        }, idx * stagger);
+                        const idx = [...els].indexOf(entry.target);
+                        setTimeout(() => entry.target.classList.add('is-visible'), idx * stagger);
                         obs.unobserve(entry.target);
                     }
                 });
