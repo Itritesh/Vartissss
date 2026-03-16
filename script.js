@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // ========================================================
-    // 0. INITIALIZE LOCOMOTIVE SCROLL (The "Smooth" Part)
+    // 0. INITIALIZE LOCOMOTIVE SCROLL
     // ========================================================
     const scrollContainer = document.querySelector('[data-scroll-container]');
     let locoScroll = null;
@@ -77,15 +77,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const links = document.querySelectorAll('.nav-links li');
 
     if (hamburger && navLinks) {
+
+        // Create backdrop
+        let backdrop = document.getElementById('nav-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'nav-backdrop';
+            backdrop.style.cssText = `
+                position: fixed; inset: 0; z-index: 1000;
+                background: rgba(0,0,0,0.45);
+                opacity: 0; pointer-events: none;
+                transition: opacity 0.3s ease;
+            `;
+            document.body.appendChild(backdrop);
+        }
+
+        const openMenu = () => {
+            navLinks.classList.add('active');
+            hamburger.classList.add('active');
+            backdrop.style.opacity = '1';
+            backdrop.style.pointerEvents = 'auto';
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeMenu = () => {
+            navLinks.classList.remove('active');
+            hamburger.classList.remove('active');
+            backdrop.style.opacity = '0';
+            backdrop.style.pointerEvents = 'none';
+            document.body.style.overflow = '';
+        };
+
         hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            hamburger.classList.toggle('active');
+            navLinks.classList.contains('active') ? closeMenu() : openMenu();
         });
+
+        backdrop.addEventListener('click', closeMenu);
 
         links.forEach(link => {
             link.addEventListener('click', (e) => {
-                navLinks.classList.remove('active');
-                hamburger.classList.remove('active');
+                closeMenu();
                 const anchor = link.querySelector('a');
                 const targetId = anchor ? anchor.getAttribute('href') : null;
                 if (targetId && targetId.startsWith('#') && locoScroll) {
@@ -94,6 +125,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (targetEl) locoScroll.scrollTo(targetEl);
                 }
             });
+        });
+
+        // Close on resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900) closeMenu();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
         });
     }
 
@@ -118,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // 5. GSAP / IntersectionObserver
+    // 5. INTERSECTION OBSERVER ANIMATIONS
     // ========================================================
     if (typeof IntersectionObserver !== 'undefined') {
         const observer = new IntersectionObserver((entries) => {
@@ -191,7 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (cursorImgContainer) gsap.to(cursorImgContainer, { opacity: 0, scale: 0.8, duration: 0.3 });
                     teamItems.forEach(other => { other.style.opacity = '1'; });
                 });
-                item.addEventListener('mousemove', (e) => { if (cursorImgContainer) gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: 'power3.out' }); });
+                item.addEventListener('mousemove', (e) => {
+                    if (cursorImgContainer) gsap.to(cursorImgContainer, { x: e.clientX, y: e.clientY, duration: 0.5, ease: 'power3.out' });
+                });
             });
         } else {
             teamItems.forEach(item => {
@@ -199,7 +242,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     const imgUrl = item.getAttribute('data-img');
                     if (imgUrl) {
                         const img = document.createElement('img');
-                        img.src = imgUrl; img.classList.add('mobile-team-img'); img.style.width = '100%'; img.style.height = '250px'; img.style.objectFit = 'cover'; img.style.borderRadius = '10px'; img.style.marginBottom = '20px';
+                        img.src = imgUrl;
+                        img.classList.add('mobile-team-img');
+                        img.style.width = '100%';
+                        img.style.height = '250px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '10px';
+                        img.style.marginBottom = '20px';
                         item.insertBefore(img, item.firstChild);
                     }
                 }
@@ -210,7 +259,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     // 9. RESIZE
     // ========================================================
-    window.addEventListener('resize', () => { clearTimeout(window.resizeTimer); window.resizeTimer = setTimeout(() => { if (locoScroll) locoScroll.update(); }, 100); });
+    window.addEventListener('resize', () => {
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(() => {
+            if (locoScroll) locoScroll.update();
+        }, 100);
+    });
 
     // ========================================================
     // 10. SERVICE HEADER ANIMATION
@@ -251,42 +305,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========================================================
-    // HELPER: sendMail - centralized mail sender (uses absolute backend)
+    // HELPER: sendMail
     // ========================================================
     async function sendMail(payload) {
-        // Production backend (Railway) — used when the site is deployed to Netlify
         const PROD_ENDPOINT = 'https://vartiss-backend-production.up.railway.app/send-mail';
         const LOCAL_ENDPOINTS = [
-            // local dev http server
             'http://localhost:5000/send-mail',
             'http://localhost:5001/send-mail',
-            // relative fallback when frontend is served from the same origin
             '/send-mail'
         ];
 
-        // Try prod first, with a retry for Railway cold starts (longer timeout)
         try {
-            // first attempt - moderate timeout
             let attempt = await postJSON(PROD_ENDPOINT, payload, 15000);
-            // if we received a response, return it (caller will inspect data.success)
             if (attempt && attempt.res) {
-                // if server error (5xx) attempt one retry with extended timeout
                 if (!attempt.res.ok && attempt.res.status >= 500) {
-                    console.warn('Production endpoint returned server error, retrying with extended timeout', attempt.res.status);
+                    console.warn('Production endpoint returned server error, retrying...', attempt.res.status);
                     try {
                         await new Promise(r => setTimeout(r, 1200));
                         const retry = await postJSON(PROD_ENDPOINT, payload, 30000);
                         return retry;
                     } catch (retryErr) {
                         console.warn('Retry to production failed', retryErr);
-                        // fall through to local fallbacks
                     }
                 } else {
                     return attempt;
                 }
             }
         } catch (err) {
-            // If the first attempt was aborted (timeout) assume possible cold start and retry with longer timeout
             console.warn('Production endpoint attempt failed', err && err.name ? err.name : err);
             if (err && err.name === 'AbortError') {
                 try {
@@ -298,7 +343,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // If production failed or retry didn't help, try local fallbacks (useful for dev)
         for (const ep of LOCAL_ENDPOINTS) {
             try {
                 const resp = await postJSON(ep, payload, 15000);
@@ -308,12 +352,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // If all endpoints fail, throw to be handled by caller
         throw new Error('All mail endpoints failed');
     }
 
     // ========================================================
-    // FORMS: unified handlers (single listener per form, normalizes payload)
+    // FORMS: unified handlers
     // ========================================================
     (function attachUnifiedFormHandlers() {
         const forms = document.querySelectorAll('form.hero-form, form#contactForm');
@@ -334,18 +377,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
-                // Prevent re-entrancy/double submissions
                 if (form.dataset.submitting === '1') return;
                 form.dataset.submitting = '1';
 
                 const submitBtn = form.querySelector("button[type='submit']");
                 const originalText = submitBtn ? submitBtn.innerText : null;
-                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Sending...'; submitBtn.setAttribute('aria-busy', 'true'); }
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Sending...';
+                    submitBtn.setAttribute('aria-busy', 'true');
+                }
 
                 const formData = new FormData(form);
 
-                // honeypot
                 const honey = normalizeFieldValue(formData.get('_gotcha'));
                 if (honey) {
                     if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (originalText) submitBtn.innerText = originalText; }
@@ -364,7 +408,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     source
                 };
 
-                // Basic client-side required check for contact form only
                 if (form.id === 'contactForm') {
                     if (!payload.name || !payload.email || !payload.message) {
                         showFormResult(form, 'Please fill in your name, email, and message.', false);
@@ -377,37 +420,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 try {
                     const endpoint = (form.dataset.formspree || form.getAttribute('action') || '').trim();
                     if (endpoint && (endpoint.includes('formspree.io') || endpoint.toLowerCase().includes('formspree'))) {
-                        // send to Formspree if explicitly configured
                         const { res, data, text } = await submitToFormspree(endpoint, payload, 12000);
                         if (data && data.success === true) {
                             showFormResult(form, 'Enquiry sent successfully', true);
                             form.reset();
                         } else {
-                            // prefer backend-provided message when available
                             const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
-                            console.error('Formspree submission issue', { endpoint, status: res && res.status, statusText: res && res.statusText, data, text });
+                            console.error('Formspree submission issue', { endpoint, status: res && res.status, data, text });
                             if (backendMsg) showFormResult(form, backendMsg, false);
                             else if (res && res.status === 404) showFormResult(form, 'Form is temporarily unavailable. Please try again later.', false);
                             else if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
                             else showFormResult(form, 'Failed to send enquiry. Please check your details and try again.', false);
                         }
                     } else {
-                        // default: use production Railway endpoint via sendMail
                         const { res, data, text } = await sendMail(payload);
                         if (data && data.success === true) {
                             showFormResult(form, 'Message sent successfully', true);
                             form.reset();
                         } else {
-                            // backend returned a non-success payload or non-200 status
                             const backendMsg = data && (data.error || data.message) ? (data.error || data.message) : null;
-                            console.error('SendMail returned non-success', { status: res && res.status, statusText: res && res.statusText, data, text });
-                            if (backendMsg) {
-                                showFormResult(form, backendMsg, false);
-                            } else if (res && res.status >= 500) {
-                                showFormResult(form, 'Server error. Please try again later.', false);
-                            } else {
-                                showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
-                            }
+                            console.error('SendMail returned non-success', { status: res && res.status, data, text });
+                            if (backendMsg) showFormResult(form, backendMsg, false);
+                            else if (res && res.status >= 500) showFormResult(form, 'Server error. Please try again later.', false);
+                            else showFormResult(form, 'Failed to send message. Please check your details and try again.', false);
                         }
                     }
                 } catch (err) {
@@ -423,13 +458,15 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 
     // ========================================================
-    // HELPER: Formspree submission (replaces backend dependency)
+    // HELPER: Formspree submission
     // ========================================================
     async function submitToFormspree(url, payload, timeout = 12000) {
         return await postJSON(url, payload, timeout);
     }
 
-    // HELPER: show form result (inline) — sanitized for users, accessible
+    // ========================================================
+    // HELPER: show form result
+    // ========================================================
     function showFormResult(form, message, success) {
         let container = form.querySelector('.form-result');
         if (!container) {
@@ -439,25 +476,25 @@ document.addEventListener("DOMContentLoaded", () => {
             container.style.marginTop = '12px';
             form.appendChild(container);
         }
-        // ensure only plain text is displayed (avoid rendering HTML or backend traces)
         container.textContent = String(message || '').trim();
         container.setAttribute('role', 'status');
         container.classList.remove('form-result-success', 'form-result-error');
         container.classList.add(success ? 'form-result-success' : 'form-result-error');
         container.style.color = success ? '#0a7a0a' : '#b71c1c';
     }
+
     // ========================================================
-    // PAGE ANIMATIONS — scroll-triggered via IntersectionObserver
+    // 11. PAGE ANIMATIONS — scroll-triggered
     // ========================================================
     (function initPageAnimations() {
         const staggerGroups = [
-            { selector: '.v-svc-card', stagger: 100 },
-            { selector: '.v-stat-block', stagger: 120 },
-            { selector: '.v-point', stagger: 100 },
-            { selector: '.v-faq-item', stagger: 80 },
-            { selector: '.v-section-label', stagger: 0 },
-            { selector: '.v-cta-band h2', stagger: 0 },
-            { selector: '.v-cta-band p', stagger: 80 },
+            { selector: '.v-svc-card',       stagger: 100 },
+            { selector: '.v-stat-block',     stagger: 120 },
+            { selector: '.v-point',          stagger: 100 },
+            { selector: '.v-faq-item',       stagger: 80  },
+            { selector: '.v-section-label',  stagger: 0   },
+            { selector: '.v-cta-band h2',    stagger: 0   },
+            { selector: '.v-cta-band p',     stagger: 80  },
             { selector: '.v-cta-row-center', stagger: 160 },
         ];
 
@@ -468,7 +505,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const obs = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // find index among siblings for stagger
                         const all = [...els];
                         const idx = all.indexOf(entry.target);
                         setTimeout(() => {
@@ -482,6 +518,5 @@ document.addEventListener("DOMContentLoaded", () => {
             els.forEach(el => obs.observe(el));
         });
     })();
-
 
 });
