@@ -276,65 +276,14 @@ body {
     display: none;
     cursor: pointer;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     gap: 5px;
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: transparent;
-    transition: border-color 0.25s, background 0.25s;
-    flex-shrink: 0;
-    z-index: 1002;
-}
-
-.hamburger:hover {
-    border-color: var(--accent);
-    background: rgba(212,175,55,0.06);
 }
 
 .bar {
-    width: 18px;
-    height: 1.5px;
+    width: 25px;
+    height: 3px;
     background-color: var(--text-main);
-    border-radius: 2px;
-    transition: background 0.25s, transform 0.3s, opacity 0.2s, width 0.25s;
-    display: block;
-}
-
-.bar:last-child {
-    width: 12px;
-}
-
-.hamburger:hover .bar {
-    background-color: var(--accent);
-}
-
-.hamburger:hover .bar:last-child {
-    width: 18px;
-}
-
-.hamburger.active {
-    border-color: var(--accent);
-    background: rgba(212,175,55,0.08);
-}
-
-.hamburger.active .bar:nth-child(1) {
-    transform: translateY(6.5px) rotate(45deg);
-    width: 18px;
-    background-color: var(--accent);
-}
-
-.hamburger.active .bar:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-}
-
-.hamburger.active .bar:nth-child(3) {
-    transform: translateY(-6.5px) rotate(-45deg);
-    width: 18px;
-    background-color: var(--accent);
+    transition: 0.3s;
 }
 
 /* BACK TO TOP BUTTON */
@@ -858,26 +807,29 @@ footer {
     /* Navbar Mobile Logic */
     .hamburger {
         display: flex;
+        z-index: 1002;
     }
 
     .nav-links {
         position: fixed;
-        top: 0;
-        right: -100%;
-        width: 280px;
-        height: 100vh;
+        top: 70px;
+        right: -280px;
+        width: 260px;
+        height: auto;
+        max-height: calc(100vh - 70px);
         background: var(--bg-card);
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
-        padding: 90px 28px 40px;
-        gap: 0;
-        border-left: 1px solid rgba(212,175,55,0.2);
-        box-shadow: -10px 0 40px rgba(0,0,0,0.3);
-        transition: right 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        padding: 24px 28px 32px;
+        gap: 4px;
+        border-left: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        border-radius: 0 0 0 16px;
+        box-shadow: -8px 8px 32px rgba(0, 0, 0, 0.25);
+        transition: right 0.35s cubic-bezier(0.22, 1, 0.36, 1);
         z-index: 1001;
         overflow-y: auto;
-        list-style: none;
     }
 
     .nav-links.active {
@@ -886,28 +838,18 @@ footer {
 
     .nav-links li {
         width: 100%;
-        border-bottom: 1px solid var(--line);
-    }
-
-    .nav-links li:last-child {
-        border-bottom: none;
     }
 
     .nav-links a {
         display: block;
-        padding: 16px 0;
-        font-size: 0.85rem;
-        letter-spacing: 2px;
-        color: var(--text-main);
-        text-transform: uppercase;
-        font-weight: 600;
+        padding: 12px 0;
+        font-size: 0.82rem;
+        letter-spacing: 1.5px;
+        border-bottom: 1px solid var(--line);
         width: 100%;
-        transition: color 0.2s, padding-left 0.2s;
     }
 
-    .nav-links a:hover, .nav-links a.active {
-        color: var(--accent);
-        padding-left: 8px;
+    .nav-links li:last-child a {
         border-bottom: none;
     }
 
