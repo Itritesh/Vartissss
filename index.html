@@ -22,1456 +22,39 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Manrope:wght@300;400;600&display=swap"
-        rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQKN8PN9QV"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
+
         gtag('config', 'G-WQKN8PN9QV');
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8280876679592716"
-        crossorigin="anonymous"></script>
-
-    <style>
-        /* =========================================
-           NEW INDEX PAGE OVERRIDES
-        ========================================= */
-
-        /* ---- Ambient background blobs ---- */
-        .v-ambient {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .v-ambient span {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(110px);
-            opacity: 0.18;
-            animation: blobDrift 18s ease-in-out infinite alternate;
-        }
-
-        .v-ambient span:nth-child(1) {
-            width: 600px;
-            height: 600px;
-            background: #d4af37;
-            top: -150px;
-            left: -100px;
-            animation-duration: 22s;
-        }
-
-        .v-ambient span:nth-child(2) {
-            width: 450px;
-            height: 450px;
-            background: #b8860b;
-            bottom: 10%;
-            right: -80px;
-            animation-duration: 17s;
-            animation-delay: -5s;
-        }
-
-        .v-ambient span:nth-child(3) {
-            width: 300px;
-            height: 300px;
-            background: #fff8dc;
-            top: 40%;
-            left: 50%;
-            animation-duration: 25s;
-            animation-delay: -10s;
-            opacity: 0.07;
-        }
-
-        @keyframes blobDrift {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            50% {
-                transform: translate(40px, 30px) scale(1.08);
-            }
-
-            100% {
-                transform: translate(-20px, 50px) scale(0.95);
-            }
-        }
-
-        /* ---- NAVBAR ---- */
-        .v-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5%;
-            height: 70px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            background: rgba(14, 14, 14, 0.7);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
-            transition: background 0.3s;
-        }
-
-        [data-theme="light"] .v-nav {
-            background: rgba(244, 244, 244, 0.8);
-        }
-
-        .v-nav .logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.45rem;
-            letter-spacing: -0.5px;
-        }
-
-        .v-nav .logo span {
-            color: var(--accent);
-        }
-
-        .v-nav .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-        }
-
-        .v-nav .nav-links {
-            display: flex;
-            gap: 28px;
-            list-style: none;
-        }
-
-        .v-nav .nav-links a {
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.82rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            transition: color 0.3s;
-            position: relative;
-        }
-
-        .v-nav .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            right: 100%;
-            height: 1px;
-            background: var(--accent);
-            transition: right 0.3s ease;
-        }
-
-        .v-nav .nav-links a:hover::after,
-        .v-nav .nav-links a.active::after {
-            right: 0;
-        }
-
-        .v-nav .nav-links a:hover,
-        .v-nav .nav-links a.active {
-            color: var(--accent);
-        }
-
-        .v-nav .theme-btn {
-            background: none;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            color: var(--text-main);
-            padding: 7px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.3s;
-            font-family: 'Manrope', sans-serif;
-        }
-
-        .v-nav .theme-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .v-nav .hamburger {
-            display: none;
-            cursor: pointer;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            width: 42px;
-            height: 42px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: transparent;
-            transition: border-color 0.25s, background 0.25s;
-            flex-shrink: 0;
-            z-index: 1002;
-        }
-
-        .v-nav .hamburger:hover {
-            border-color: var(--accent);
-            background: rgba(212,175,55,0.06);
-        }
-
-        .v-nav .bar {
-            width: 18px;
-            height: 1.5px;
-            background-color: var(--text-main);
-            border-radius: 2px;
-            transition: background 0.25s, transform 0.3s, opacity 0.2s, width 0.25s;
-            display: block;
-        }
-
-        .v-nav .bar:last-child {
-            width: 12px;
-        }
-
-        .v-nav .hamburger:hover .bar {
-            background-color: var(--accent);
-        }
-
-        .v-nav .hamburger:hover .bar:last-child {
-            width: 18px;
-        }
-
-        .v-nav .hamburger.active {
-            border-color: var(--accent);
-            background: rgba(212,175,55,0.08);
-        }
-
-        .v-nav .hamburger.active .bar:nth-child(1) {
-            transform: translateY(6.5px) rotate(45deg);
-            width: 18px;
-            background-color: var(--accent);
-        }
-
-        .v-nav .hamburger.active .bar:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-
-        .v-nav .hamburger.active .bar:nth-child(3) {
-            transform: translateY(-6.5px) rotate(-45deg);
-            width: 18px;
-            background-color: var(--accent);
-        }
-
-        /* ---- HERO ---- */
-        .v-hero {
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            padding: 80px 5% 60px;
-            position: relative;
-            overflow: hidden;
-            gap: 60px;
-        }
-
-        /* Subtle grid texture */
-        .v-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .v-hero-left {
-            position: relative;
-            z-index: 2;
-        }
-
-        .v-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--accent);
-            margin-bottom: 28px;
-        }
-
-        .v-eyebrow::before {
-            content: '';
-            width: 28px;
-            height: 1px;
-            background: var(--accent);
-        }
-
-        .v-hero-title {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2.8rem, 5.5vw, 5rem);
-            font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: -1.5px;
-            margin-bottom: 28px;
-            color: var(--text-main);
-        }
-
-        .v-hero-title em {
-            font-style: normal;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--accent);
-            display: block;
-        }
-
-        [data-theme="light"] .v-hero-title em {
-            -webkit-text-stroke: 1.5px #b8860b;
-        }
-
-        .v-hero-desc {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-            line-height: 1.85;
-            margin-bottom: 44px;
-            max-width: 480px;
-        }
-
-        .v-cta-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 60px;
-        }
-
-        .v-btn-primary {
-            padding: 14px 32px;
-            border-radius: 4px;
-            background: var(--accent);
-            color: #000;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 0.88rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            display: inline-block;
-            border: 1px solid var(--accent);
-        }
-
-        .v-btn-primary:hover {
-            background: transparent;
-            color: var(--accent);
-        }
-
-        .v-btn-ghost {
-            padding: 14px 32px;
-            border-radius: 4px;
-            background: transparent;
-            color: var(--text-main);
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 0.88rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            display: inline-block;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        [data-theme="light"] .v-btn-ghost {
-            border-color: rgba(0, 0, 0, 0.15);
-        }
-
-        .v-btn-ghost:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .v-hero-badges {
-            display: flex;
-            gap: 32px;
-            flex-wrap: wrap;
-        }
-
-        .v-badge {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .v-badge-val {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.9rem;
-            font-weight: 800;
-            color: var(--accent);
-            line-height: 1;
-        }
-
-        .v-badge-lbl {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-        }
-
-        /* ---- FORM PANEL ---- */
-        .v-hero-right {
-            position: relative;
-            z-index: 2;
-        }
-
-        .v-form-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(212, 175, 55, 0.18);
-            border-radius: 16px;
-            padding: 44px 38px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        [data-theme="light"] .v-form-panel {
-            background: rgba(0, 0, 0, 0.02);
-            border-color: rgba(184, 134, 11, 0.2);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
-        }
-
-        .v-form-panel::before {
-            content: '';
-            position: absolute;
-            top: -60px;
-            right: -60px;
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 70%);
-            pointer-events: none;
-        }
-
-        .v-panel-tag {
-            display: inline-block;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent);
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            padding: 5px 12px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-        }
-
-        .v-form-panel h3 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .v-form-panel .v-form-sub {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-        }
-
-        .v-field {
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .v-field label {
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 7px;
-        }
-
-        .v-field input,
-        .v-field select {
-            padding: 12px 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-family: 'Manrope', sans-serif;
-            font-size: 0.92rem;
-            outline: none;
-            transition: border-color 0.3s, background 0.3s;
-        }
-
-        /* ✅ ADD THESE TWO RULES — fixes dark mode dropdown options */
-        .v-field select option {
-            background-color: #1a1a1a;
-            color: #f0f0f0;
-        }
-
-        [data-theme="light"] .v-field select option {
-            background-color: #ffffff;
-            color: #1a1a1a;
-        }
-
-        [data-theme="light"] .v-field input,
-        [data-theme="light"] .v-field select {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.1);
-        }
-
-        .v-field input:focus,
-        .v-field select:focus {
-            border-color: var(--accent);
-            background: rgba(212, 175, 55, 0.04);
-        }
-
-        .v-field select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a0a0a0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 36px;
-        }
-
-        .v-submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            letter-spacing: 0.5px;
-            margin-top: 6px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .v-submit-btn::after {
-            content: '→';
-            margin-left: 8px;
-            transition: margin-left 0.3s;
-        }
-
-        .v-submit-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .v-submit-btn:hover::after {
-            margin-left: 14px;
-        }
-
-        .form-result {
-            margin-top: 12px;
-            text-align: center;
-            font-size: 0.88rem;
-        }
-
-        /* ---- TICKER ---- */
-        .v-ticker {
-            background: var(--accent);
-            overflow: hidden;
-            white-space: nowrap;
-            padding: 13px 0;
-            position: relative;
-            z-index: 2;
-        }
-
-        .v-ticker-track {
-            display: inline-block;
-            animation: tickerMove 25s linear infinite;
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 0.85rem;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: #000;
-        }
-
-        @keyframes tickerMove {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-50%);
-            }
-        }
-
-        .v-ticker-sep {
-            margin: 0 20px;
-            opacity: 0.4;
-        }
-
-        /* ---- SERVICES SECTION ---- */
-        .v-services {
-            padding: 120px 5%;
-            border-bottom: 1px solid var(--line);
-            position: relative;
-        }
-
-        .v-section-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--accent);
-            margin-bottom: 60px;
-        }
-
-        .v-section-label::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(212, 175, 55, 0.25);
-            max-width: 60px;
-        }
-
-        .v-services-header {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: end;
-            margin-bottom: 80px;
-        }
-
-        .v-services-header h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2.2rem, 5vw, 4rem);
-            font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: -1px;
-            color: var(--text-main);
-        }
-
-        .v-services-header p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.8;
-            align-self: end;
-        }
-
-        .v-services-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: var(--line);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .v-svc-card {
-            background: var(--bg-main);
-            padding: 40px 32px;
-            position: relative;
-            transition: background 0.3s;
-            cursor: default;
-        }
-
-        [data-theme="light"] .v-svc-card {
-            background: var(--bg-card);
-        }
-
-        .v-svc-card:hover {
-            background: rgba(212, 175, 55, 0.04);
-        }
-
-        [data-theme="light"] .v-svc-card:hover {
-            background: rgba(212, 175, 55, 0.06);
-        }
-
-        .v-svc-num {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: rgba(212, 175, 55, 0.4);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .v-svc-card h3 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 14px;
-        }
-
-        .v-svc-card p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.75;
-            margin-bottom: 24px;
-        }
-
-        .v-svc-link {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: gap 0.3s;
-        }
-
-        .v-svc-link:hover {
-            gap: 10px;
-        }
-
-        /* ---- WHY US ---- */
-        .v-why {
-            padding: 120px 5%;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .v-why-inner {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-        }
-
-        .v-why-left h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2rem, 4.5vw, 3.5rem);
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -1px;
-            color: var(--text-main);
-            margin-bottom: 24px;
-        }
-
-        .v-why-left h2 span {
-            color: var(--accent);
-        }
-
-        .v-why-left p {
-            font-size: 1rem;
-            color: var(--text-muted);
-            line-height: 1.85;
-            margin-bottom: 36px;
-        }
-
-        .v-points {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        .v-point {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            padding: 22px 0;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .v-point:first-child {
-            border-top: 1px solid var(--line);
-        }
-
-        .v-point-num {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: var(--accent);
-            min-width: 28px;
-            padding-top: 3px;
-            letter-spacing: 1px;
-        }
-
-        .v-point-body h4 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .v-point-body p {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            line-height: 1.7;
-            margin: 0;
-        }
-
-        /* Right panel: big stat blocks */
-        .v-why-right {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .v-stat-block {
-            background: var(--bg-card);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 36px 28px;
-            transition: border-color 0.3s, transform 0.3s;
-        }
-
-        .v-stat-block:hover {
-            border-color: var(--accent);
-            transform: translateY(-6px);
-        }
-
-        .v-stat-block:nth-child(2) {
-            margin-top: 24px;
-        }
-
-        .v-stat-block:nth-child(3) {
-            margin-top: -24px;
-        }
-
-        .v-stat-big {
-            font-family: 'Syne', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--accent);
-            line-height: 1;
-            margin-bottom: 10px;
-        }
-
-        .v-stat-block p {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        /* ---- FAQ ---- */
-        .v-faq {
-            padding: 120px 5%;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .v-faq-inner {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr;
-            gap: 80px;
-            align-items: start;
-        }
-
-        .v-faq-left {
-            position: sticky;
-            top: 100px;
-        }
-
-        .v-faq-left h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 800;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            color: var(--text-main);
-            margin-bottom: 20px;
-        }
-
-        .v-faq-left h2 span {
-            color: var(--accent);
-        }
-
-        .v-faq-left p {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            line-height: 1.8;
-        }
-
-        .v-faq-list {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .v-faq-item {
-            border-bottom: 1px solid var(--line);
-        }
-
-        .v-faq-item:first-child {
-            border-top: 1px solid var(--line);
-        }
-
-        .v-faq-q {
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 24px 0;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            transition: color 0.3s;
-        }
-
-        .v-faq-q:hover .v-faq-title {
-            color: var(--accent);
-        }
-
-        .v-faq-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-main);
-            transition: color 0.3s;
-        }
-
-        .v-faq-icon {
-            width: 28px;
-            height: 28px;
-            border: 1px solid rgba(212, 175, 55, 0.35);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent);
-            font-size: 1rem;
-            flex-shrink: 0;
-            transition: transform 0.35s, background 0.3s;
-        }
-
-        .v-faq-item.active .v-faq-icon {
-            transform: rotate(45deg);
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .v-faq-a {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease, padding 0.3s;
-        }
-
-        .v-faq-item.active .v-faq-a {
-            max-height: 300px;
-        }
-
-        .v-faq-a p {
-            font-size: 0.92rem;
-            color: var(--text-muted);
-            line-height: 1.85;
-            padding-bottom: 24px;
-            margin: 0;
-        }
-
-        /* ---- CTA BAND ---- */
-        .v-cta-band {
-            padding: 100px 5%;
-            background: radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.1), transparent 70%);
-            text-align: center;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .v-cta-band h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2.2rem, 5vw, 4rem);
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: var(--text-main);
-            margin-bottom: 16px;
-        }
-
-        .v-cta-band h2 em {
-            font-style: normal;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--accent);
-        }
-
-        .v-cta-band p {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-            margin-bottom: 44px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .v-cta-row-center {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* ---- FOOTER ---- */
-        .v-footer {
-            padding: 60px 5% 30px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--line);
-        }
-
-        .v-footer-top {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 60px;
-        }
-
-        .v-footer-brand .logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.4rem;
-            margin-bottom: 14px;
-            display: block;
-        }
-
-        .v-footer-brand .logo span {
-            color: var(--accent);
-        }
-
-        .v-footer-brand p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.7;
-            max-width: 320px;
-        }
-
-        .v-footer-col h4 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .v-footer-col a {
-            display: block;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            transition: color 0.3s;
-        }
-
-        .v-footer-col a:hover {
-            color: var(--accent);
-        }
-
-        .v-footer-col a.active {
-            color: var(--accent);
-        }
-
-        .v-footer-bottom {
-            border-top: 1px solid var(--line);
-            padding-top: 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .v-footer-bottom p {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }
-
-        .v-footer-bottom .v-socials {
-            display: flex;
-            gap: 20px;
-        }
-
-        .v-footer-bottom .v-socials a {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .v-footer-bottom .v-socials a:hover {
-            color: var(--accent);
-        }
-
-        /* back to top */
-        .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 46px;
-            height: 46px;
-            background: var(--accent);
-            color: #000;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            z-index: 999;
-            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.35);
-            transition: transform 0.3s;
-        }
-
-        .back-to-top:hover {
-            transform: translateY(-4px);
-        }
-
-        /* ---- RESPONSIVE ---- */
-        @media (max-width: 1024px) {
-            .v-services-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .v-why-inner {
-                grid-template-columns: 1fr;
-                gap: 50px;
-            }
-
-            .v-why-right {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .v-stat-block:nth-child(2) {
-                margin-top: 0;
-            }
-
-            .v-stat-block:nth-child(3) {
-                margin-top: 0;
-            }
-
-            .v-footer-top {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .v-hero {
-                grid-template-columns: 1fr;
-                padding-top: 110px;
-                gap: 50px;
-            }
-
-            .v-services-header {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .v-faq-inner {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .v-faq-left {
-                position: static;
-            }
-
-            .v-nav .hamburger {
-                display: flex;
-            }
-
-            .v-nav .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 280px;
-                height: 100vh;
-                background: var(--bg-card);
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: flex-start;
-                padding: 90px 28px 40px;
-                gap: 0;
-                border-left: 1px solid rgba(212,175,55,0.2);
-                box-shadow: -10px 0 40px rgba(0,0,0,0.3);
-                transition: right 0.38s cubic-bezier(0.22, 1, 0.36, 1);
-                z-index: 1001;
-                overflow-y: auto;
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-            }
-
-            .v-nav .nav-links.active {
-                right: 0;
-            }
-
-            .v-nav .nav-links li {
-                width: 100%;
-                border-bottom: 1px solid var(--line);
-            }
-
-            .v-nav .nav-links li:last-child {
-                border-bottom: none;
-            }
-
-            .v-nav .nav-links a {
-                display: block;
-                padding: 16px 0;
-                font-size: 0.85rem;
-                letter-spacing: 2px;
-                color: var(--text-main);
-                text-transform: uppercase;
-                font-weight: 600;
-                width: 100%;
-                transition: color 0.2s, padding-left 0.2s;
-            }
-
-            .v-nav .nav-links a:hover,
-            .v-nav .nav-links a.active {
-                color: var(--accent);
-                padding-left: 8px;
-                border-bottom: none;
-            }
-
-            .v-nav .nav-links a::after {
-                display: none;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .v-hero {
-                padding: 90px 5% 50px;
-            }
-
-            .v-hero-title {
-                font-size: clamp(2.2rem, 8vw, 3rem);
-            }
-
-            .v-services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .v-why-right {
-                grid-template-columns: 1fr;
-            }
-
-            .v-stat-block:nth-child(2),
-            .v-stat-block:nth-child(3) {
-                margin-top: 0;
-            }
-
-            .v-footer-top {
-                grid-template-columns: 1fr;
-                gap: 36px;
-            }
-
-            .v-footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .v-cta-row,
-            .v-cta-row-center {
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
-            }
-
-            .v-services-header h2 {
-                font-size: 2rem;
-            }
-
-            .v-form-panel {
-                padding: 32px 22px;
-            }
-        }
-
-        /* =========================================
-   PAGE ANIMATIONS
-   ========================================= */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideRight {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Hero left content */
-        .v-hero-left {
-            animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 1.9s;
-            /* fires after preloader */
-        }
-
-        .v-eyebrow {
-            animation: slideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 2s;
-        }
-
-        .v-hero-title {
-            animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 2.1s;
-        }
-
-        .v-hero-desc {
-            animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 2.25s;
-        }
-
-        .v-cta-row {
-            animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 2.4s;
-        }
-
-        .v-hero-badges {
-            animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 2.55s;
-        }
-
-        /* Hero form panel */
-        .v-hero-right {
-            animation: fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) both;
-            animation-delay: 2.2s;
-        }
-
-        /* Ticker */
-        .v-ticker {
-            animation: fadeIn 0.5s ease both;
-            animation-delay: 2.7s;
-        }
-
-        /* Service cards — staggered via JS class */
-        .v-svc-card {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .v-svc-card.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Why/stat blocks */
-        .v-stat-block {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .v-stat-block.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Why points */
-        .v-point {
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .v-point.is-visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* FAQ items */
-        .v-faq-item {
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .v-faq-item.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Section labels */
-        .v-section-label {
-            opacity: 0;
-            animation: slideRight 0.6s ease both;
-        }
-
-        .v-section-label.is-visible {
-            opacity: 1;
-        }
-
-        /* CTA band */
-        .v-cta-band h2,
-        .v-cta-band p,
-        .v-cta-row-center {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .v-cta-band h2.is-visible,
-        .v-cta-band p.is-visible,
-        .v-cta-row-center.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
+     crossorigin="anonymous"></script>
 </head>
 
 <body>
 
-    <!-- Ambient background -->
-    <div class="v-ambient" aria-hidden="true">
-        <span></span><span></span><span></span>
-    </div>
-
-    <!-- PRELOADER (reuses existing .preloader from style.css) -->
     <div class="preloader">
         <div class="loader-text">VARTISTIC</div>
         <div class="loader-bar">
             <div class="loader-progress"></div>
         </div>
     </div>
-
-    <!-- NAVBAR -->
-    <nav class="v-nav navbar">
+    x
+    <nav class="navbar">
         <div class="logo">Vartistic<span>.</span></div>
         <div class="nav-right">
             <ul class="nav-links">
                 <li><a href="#home" data-scroll-to class="active">Home</a></li>
-                <li><a href="about.html">Our Work</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="work.html">Our Work</a></li>
                 <li><a href="services.html">Services</a></li>
                 <li><a href="team.html">The Squad</a></li>
                 <li><a href="contact.html">Contact</a></li>
@@ -1487,351 +70,229 @@
 
     <div id="main-container" data-scroll-container>
 
-        <!-- ===================== HERO ===================== -->
-        <header class="v-hero" id="home" data-scroll-section>
+        <header class="hero" id="home" data-scroll-section>
+            <div class="hero-bg"></div>
 
-            <div class="v-hero-left" data-scroll data-scroll-speed="0.5">
-                <span class="v-eyebrow">Web Development Agency</span>
+            <div class="drag-object" data-scroll data-scroll-speed="2" style="top: 55%; left: 42%;">
+                <span class="drag-instruction">Drag Me</span>
+            </div>
 
-                <h1 class="v-hero-title">
-                    We Build<br>
-                    Websites That<br>
-                    <em>Actually Work.</em>
-                </h1>
+            <div class="drag-object mobile-orb" style="top: 18%; left: 8%; opacity: 0.75;" aria-hidden="true"></div>
 
-                <p class="v-hero-desc">
-                    Custom code, zero bloat, real results. From scratch builds and template edits
-                    to Python automation — Vartistic Studio delivers quality that ranks and converts.
+            <div class="hero-content" data-scroll data-scroll-speed="1">
+                <h1>Crafting Next-Gen<br><span class="text-gradient">Experience.</span></h1>
+                <p>We are a full-service development agency. We build <strong>Custom Websites</strong>, edit
+                    <strong>HTML Templates</strong>, create <strong>Pixel-Perfect Replicas</strong>, and build
+                    <strong>Python Tools</strong>. From problem-solving to rapid "Vibe Coding," we deliver results.
                 </p>
-
-                <div class="v-cta-row">
-                    <a href="services.html" class="v-btn-primary">Explore Services</a>
-                    <a href="contact.html" class="v-btn-ghost">Start a Project</a>
-                </div>
-
-                <div class="v-hero-badges">
-                    <div class="v-badge">
-                        <span class="v-badge-val">100%</span>
-                        <span class="v-badge-lbl">Custom Code</span>
-                    </div>
-                    <div class="v-badge">
-                        <span class="v-badge-val">Fast</span>
-                        <span class="v-badge-lbl">Delivery</span>
-                    </div>
-                    <div class="v-badge">
-                        <span class="v-badge-val">SEO</span>
-                        <span class="v-badge-lbl">Optimized</span>
-                    </div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="services.html" class="cta-btn primary">View All Services</a>
+                    <a href="work.html" class="cta-btn secondary">See Our Work</a>
                 </div>
             </div>
 
-            <!-- FORM -->
-            <div class="v-hero-right" data-scroll data-scroll-speed="0.8">
-                <div class="v-form-panel">
-                    <span class="v-panel-tag">Free Consultation</span>
-                    <h3>Get Started Today</h3>
-                    <p class="v-form-sub">Tell us about your project — we'll respond within 24 hrs.</p>
+            <div class="hero-form-container" data-scroll data-scroll-speed="1.5">
+                <form class="hero-form" novalidate>
+                    <h3>Start Your Project</h3>
 
-                    <form class="hero-form" novalidate>
-                        <input type="text" name="_gotcha"
-                            style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;"
-                            tabindex="-1" aria-hidden="true">
+                    <input type="text" name="_gotcha"
+                        style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;"
+                        tabindex="-1" aria-hidden="true">
 
-                        <div class="v-field">
-                            <label for="name">Your Name</label>
-                            <input type="text" id="name" name="name" placeholder="John Doe" required>
-                        </div>
-                        <div class="v-field">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" placeholder="john@example.com" required>
-                        </div>
-                        <div class="v-field">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" placeholder="(555) 000-0000">
-                        </div>
-                        <div class="v-field">
-                            <label for="service">What do you need?</label>
-                            <select id="service" name="message" required>
-                                <option value="">Select a service</option>
-                                <option>Build from Scratch</option>
-                                <option>Template Editing</option>
-                                <option>Website Replica/Clone</option>
-                                <option>Redesign & Fixes</option>
-                                <option>Python Automation</option>
-                            </select>
-                        </div>
+                    <div class="form-group"><input type="text" name="name" placeholder="Your Name" required></div>
+                    <div class="form-group"><input type="email" name="email" placeholder="Your Email" required></div>
+                    <div class="form-group">
 
-                        <button type="submit" class="v-submit-btn btn-submit">Send Request</button>
-                        <div class="form-result" aria-live="polite"></div>
-                    </form>
-                </div>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                    </div>
+                    <div class="form-group">
+                        <select name="message" required>
+                            <option value="">What do you need?</option>
+                            <option>Build from Scratch</option>
+                            <option>Template Editing</option>
+                            <option>Website Replica/Clone</option>
+                            <option>Redesign & Fixes</option>
+                            <option>Python Automation</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Let's Talk</button>
+                    <div class="form-result" aria-live="polite" style="margin-top:12px;"></div>
+                </form>
             </div>
         </header>
 
-        <!-- ===================== TICKER ===================== -->
-        <div class="v-ticker" aria-hidden="true" data-scroll-section>
-            <div class="v-ticker-track">
-                Custom Web Dev <span class="v-ticker-sep">✦</span>
-                SEO Optimized <span class="v-ticker-sep">✦</span>
-                Template Editing <span class="v-ticker-sep">✦</span>
-                Python Automation <span class="v-ticker-sep">✦</span>
-                Website Cloning <span class="v-ticker-sep">✦</span>
-                Fast Delivery <span class="v-ticker-sep">✦</span>
-                24/7 Maintenance <span class="v-ticker-sep">✦</span>
-                Mobile First Design <span class="v-ticker-sep">✦</span>
-                Custom Web Dev <span class="v-ticker-sep">✦</span>
-                SEO Optimized <span class="v-ticker-sep">✦</span>
-                Template Editing <span class="v-ticker-sep">✦</span>
-                Python Automation <span class="v-ticker-sep">✦</span>
-                Website Cloning <span class="v-ticker-sep">✦</span>
-                Fast Delivery <span class="v-ticker-sep">✦</span>
-                24/7 Maintenance <span class="v-ticker-sep">✦</span>
-                Mobile First Design <span class="v-ticker-sep">✦</span>
+        <div class="marquee-section" data-scroll-section>
+            <div class="marquee-content" data-scroll data-scroll-speed="2" data-scroll-direction="horizontal">
+                <span>CUSTOM BUILDS • TEMPLATE EDITING • WEBSITE CLONING • PYTHON AUTOMATION • REDESIGNS • FAST DELIVERY
+                    • CUSTOM BUILDS • TEMPLATE EDITING • </span>
             </div>
         </div>
 
-        <!-- ===================== SERVICES ===================== -->
-        <section class="v-services" data-scroll-section>
-            <div class="v-section-label">What We Do</div>
+        <!-- SERVICES SECTION -->
+        <section id="services" data-scroll-section class="services-modern">
+            <h2 class="section-title" data-scroll data-scroll-speed="0.5">Comprehensive <span
+                    class="highlight">Solutions</span></h2>
 
-            <div class="v-services-header">
-                <h2>Everything your<br>digital presence needs.</h2>
-                <p>From one-page sites to complex platforms — we write clean, optimized
-                    code that performs. No builders, no bloat, no limits.</p>
+            <div class="feature-grid">
+
+                <!-- Card 01: Build & Redesign -->
+                <div class="feature-card" data-scroll data-scroll-speed="0.5">
+                    <div class="card-bg-glow"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="icon-box">🚀</div> <!-- Replace with Lottie if preferred -->
+                            <span class="card-step">01</span>
+                        </div>
+                        <h3>Build & Redesign</h3>
+                        <p>We build websites from scratch or modernize existing ones. We focus on clean code, SEO
+                            rankings, and high performance.</p>
+                        <a href="services.html" class="card-link">Explore Services &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Card 02: Edits & Replicas -->
+                <div class="feature-card" data-scroll data-scroll-speed="0.7">
+                    <div class="card-bg-glow"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="icon-box">⚡</div>
+                            <span class="card-step">02</span>
+                        </div>
+                        <h3>Edits & Replicas</h3>
+                        <p>Got a template? We edit it. Want a clone? We replicate it perfectly. We also offer "Vibe
+                            Coding" for super-fast delivery.</p>
+                        <a href="services.html" class="card-link">See Capabilities &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Card 03: Tools & Maintenance -->
+                <div class="feature-card" data-scroll data-scroll-speed="0.9">
+                    <div class="card-bg-glow"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="icon-box">🛠️</div>
+                            <span class="card-step">03</span>
+                        </div>
+                        <h3>Tools & Maintenance</h3>
+                        <p>We fix bugs, maintain sites, and build Python automation tools (like our Auto-Mailer) to
+                            solve real business problems.</p>
+                        <a href="services.html" class="card-link">View Tools &rarr;</a>
+                    </div>
+                </div>
+
             </div>
+        </section>
 
-            <div class="v-services-grid">
-                <div class="v-svc-card" data-scroll data-scroll-speed="0.4">
-                    <span class="v-svc-num">01</span>
-                    <h3>Custom Website Development</h3>
-                    <p>Built from scratch with clean, hand-coded structure. SEO-friendly, lightning-fast, and designed
-                        to convert visitors into clients.</p>
-                    <a href="services.html" class="v-svc-link">Learn More →</a>
+        <section class="stats-section" data-scroll-section>
+            <div class="stats-container">
+                <div class="stat-box" data-scroll data-scroll-speed="1">
+                    <span class="stat-number">#1</span>
+                    <span class="stat-label">Code Quality</span>
                 </div>
-                <div class="v-svc-card" data-scroll data-scroll-speed="0.5">
-                    <span class="v-svc-num">02</span>
-                    <h3>Template Editing & Redesigns</h3>
-                    <p>Already have a template? We strip the bloat, customize deeply, and modernize the look to make it
-                        truly yours.</p>
-                    <a href="services.html" class="v-svc-link">Learn More →</a>
+                <div class="stat-box" data-scroll data-scroll-speed="1.5">
+                    <span class="stat-number">Fast</span>
+                    <span class="stat-label">Vibe Coding</span>
                 </div>
-                <div class="v-svc-card" data-scroll data-scroll-speed="0.6">
-                    <span class="v-svc-num">03</span>
-                    <h3>Website Cloning & Replicas</h3>
-                    <p>Admire a design? We recreate it pixel-perfect with your content, branding, and custom
-                        functionality baked in.</p>
-                    <a href="services.html" class="v-svc-link">Learn More →</a>
-                </div>
-                <div class="v-svc-card" data-scroll data-scroll-speed="0.4">
-                    <span class="v-svc-num">04</span>
-                    <h3>Python Automation Tools</h3>
-                    <p>Automate the repetitive. Email outreach, data scraping, report generation — we solve manual
-                        problems with clean Python logic.</p>
-                    <a href="services.html" class="v-svc-link">Learn More →</a>
-                </div>
-                <div class="v-svc-card" data-scroll data-scroll-speed="0.5">
-                    <span class="v-svc-num">05</span>
-                    <h3>Maintenance & Support</h3>
-                    <p>Ongoing bug fixes, updates, security patches, and performance monitoring so your site stays
-                        running at its best.</p>
-                    <a href="services.html" class="v-svc-link">Learn More →</a>
-                </div>
-                <div class="v-svc-card" data-scroll data-scroll-speed="0.6">
-                    <span class="v-svc-num">06</span>
-                    <h3>Rapid Development</h3>
-                    <p>Need it fast? Our streamlined process gets high-quality sites live in days — without sacrificing
-                        quality or SEO performance.</p>
-                    <a href="services.html" class="v-svc-link">Learn More →</a>
+                <div class="stat-box" data-scroll data-scroll-speed="2">
+                    <span class="stat-number">Real</span>
+                    <span class="stat-label">Solutions</span>
                 </div>
             </div>
         </section>
 
-        <!-- ===================== WHY VARTISTIC ===================== -->
-        <section class="v-why" data-scroll-section>
-            <div class="v-why-inner">
-                <div class="v-why-left">
-                    <div class="v-section-label">Why Us</div>
-                    <h2>Built different.<br>Delivered <span>better.</span></h2>
-                    <p>We don't use page builders or generic templates. Every line of code is
-                        written with intention — for speed, search engines, and conversion.</p>
-
-                    <div class="v-points">
-                        <div class="v-point">
-                            <span class="v-point-num">01</span>
-                            <div class="v-point-body">
-                                <h4>100% Custom Code</h4>
-                                <p>No Elementor. No Wix. Pure hand-written HTML, CSS, and JS for complete control.</p>
-                            </div>
-                        </div>
-                        <div class="v-point">
-                            <span class="v-point-num">02</span>
-                            <div class="v-point-body">
-                                <h4>SEO From the Ground Up</h4>
-                                <p>Every project is architected with technical SEO in mind — structure, speed, and
-                                    metadata.</p>
-                            </div>
-                        </div>
-                        <div class="v-point">
-                            <span class="v-point-num">03</span>
-                            <div class="v-point-body">
-                                <h4>Transparent Pricing</h4>
-                                <p>No hidden fees, no surprise invoices. Clear quotes before any work begins.</p>
-                            </div>
-                        </div>
-                        <div class="v-point">
-                            <span class="v-point-num">04</span>
-                            <div class="v-point-body">
-                                <h4>Real Human Support</h4>
-                                <p>You deal with the people who built your site — not a ticket system.</p>
-                            </div>
-                        </div>
+        <section data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.6">Why <span class="highlight">Vartistic?</span>
+            </h2>
+            <div class="about-grid">
+                <div class="about-card" data-scroll data-scroll-speed="0.9">
+                    <h3>Full Code Control</h3>
+                    <p>We don't use builders. Whether it's a scratch build, a replica, or a template edit, we write the
+                        code directly. This guarantees better customization and speed.</p>
+                    <div class="pill-row">
+                        <span class="pill">HTML/CSS</span><span class="pill">Python</span><span class="pill">No
+                            CMS</span>
+                    </div>
+                </div>
+                <div class="about-card" data-scroll data-scroll-speed="0.5">
+                    <h3>SEO & Ranking</h3>
+                    <p>Everything we do—from custom builds to replicas—is optimized for search engines. We structure
+                        your site specifically to help you rank at the top.</p>
+                    <div class="pill-row">
+                        <span class="pill">SEO</span><span class="pill">Ranking</span><span class="pill">Traffic</span>
+                    </div>
+                </div>
+                <div class="about-card" data-scroll data-scroll-speed="0.7">
+                    <h3>Problem Solvers</h3>
+                    <p>We build tools for the real world. Our Python Auto-Mailer is proof we can automate your business.
+                        We are currently building even bigger tools for the future.</p>
+                    <div class="pill-row">
+                        <span class="pill">Automation</span><span class="pill">Logic</span><span
+                            class="pill">Tools</span>
                     </div>
                 </div>
 
-                <div class="v-why-right">
-                    <div class="v-stat-block" data-scroll data-scroll-speed="0.3">
-                        <div class="v-stat-big">6+</div>
-                        <p>Specialist developers and designers on the team</p>
-                    </div>
-                    <div class="v-stat-block" data-scroll data-scroll-speed="0.6">
-                        <div class="v-stat-big">100%</div>
-                        <p>Custom-coded projects — zero page builder reliance</p>
-                    </div>
-                    <div class="v-stat-block" data-scroll data-scroll-speed="0.3">
-                        <div class="v-stat-big">24h</div>
-                        <p>Average response time on support requests</p>
-                    </div>
-                    <div class="v-stat-block" data-scroll data-scroll-speed="0.6">
-                        <div class="v-stat-big">SEO</div>
-                        <p>Built-in from day one, not bolted on as an afterthought</p>
-                    </div>
+            </div>
+        </section>
+
+        <section data-scroll-section>
+            <h2 class="section-title" data-scroll data-scroll-speed="0.6">FAQs</h2>
+            <div class="faq-container">
+                <div class="faq-item" data-scroll data-scroll-speed="0.9">
+                    <div class="faq-question">Can you edit a template or clone a site? <span>+</span></div>
+                    <div class="faq-answer">Yes! We offer HTML template editing and website replica services. We can
+                        make a site look exactly how you want it using clean code.</div>
+                </div>
+                <div class="faq-item" data-scroll data-scroll-speed="0.7">
+                    <div class="faq-question">What is "Vibe Coding"? <span>+</span></div>
+                    <div class="faq-answer">It is our fast-track service. If you need a landing page or simple site
+                        urgently, we use rapid coding techniques to deliver it in record time.</div>
+                </div>
+                <div class="faq-item" data-scroll data-scroll-speed="0.5">
+                    <div class="faq-question">Do you also do maintenance & automation? <span>+</span></div>
+                    <div class="faq-answer">Yes. We fix bugs, update sites, and build Python tools (like bulk mailers)
+                        to solve real-life efficiency problems.</div>
                 </div>
             </div>
         </section>
 
-        <!-- ===================== FAQ ===================== -->
-        <section class="v-faq" data-scroll-section>
-            <div class="v-faq-inner">
-                <div class="v-faq-left">
-                    <div class="v-section-label">FAQ</div>
-                    <h2>Common<br><span>Questions</span></h2>
-                    <p>Everything you need to know before kicking off your project with us.</p>
-                </div>
+        <button class="back-to-top">↑</button>
 
-                <div class="v-faq-list">
-                    <div class="v-faq-item faq-item">
-                        <button class="v-faq-q faq-header">
-                            <span class="v-faq-title faq-title">How does your process work?</span>
-                            <span class="v-faq-icon faq-toggle">+</span>
-                        </button>
-                        <div class="v-faq-a faq-body">
-                            <p>We start with a consultation to understand your goals, then provide a clear timeline and
-                                quote. Once approved, we build iteratively with regular updates, then hand off with full
-                                documentation.</p>
-                        </div>
-                    </div>
-                    <div class="v-faq-item faq-item">
-                        <button class="v-faq-q faq-header">
-                            <span class="v-faq-title faq-title">Why custom code over page builders?</span>
-                            <span class="v-faq-icon faq-toggle">+</span>
-                        </button>
-                        <div class="v-faq-a faq-body">
-                            <p>Custom code gives you complete control, faster load times (no bloated plugins), better
-                                SEO, and the ability to add any feature you can imagine. Page builders come with
-                                invisible ceilings.</p>
-                        </div>
-                    </div>
-                    <div class="v-faq-item faq-item">
-                        <button class="v-faq-q faq-header">
-                            <span class="v-faq-title faq-title">Do you provide ongoing maintenance?</span>
-                            <span class="v-faq-icon faq-toggle">+</span>
-                        </button>
-                        <div class="v-faq-a faq-body">
-                            <p>Yes. We offer ongoing support packages covering security updates, bug fixes, performance
-                                optimization, and new feature development as your business grows.</p>
-                        </div>
-                    </div>
-                    <div class="v-faq-item faq-item">
-                        <button class="v-faq-q faq-header">
-                            <span class="v-faq-title faq-title">Can you migrate my WordPress site?</span>
-                            <span class="v-faq-icon faq-toggle">+</span>
-                        </button>
-                        <div class="v-faq-a faq-body">
-                            <p>Absolutely. We migrate, redesign, and convert WordPress sites to custom code for better
-                                performance, security, and long-term flexibility.</p>
-                        </div>
-                    </div>
-                    <div class="v-faq-item faq-item">
-                        <button class="v-faq-q faq-header">
-                            <span class="v-faq-title faq-title">How long does a typical project take?</span>
-                            <span class="v-faq-icon faq-toggle">+</span>
-                        </button>
-                        <div class="v-faq-a faq-body">
-                            <p>Landing pages: 1–2 weeks. Full websites: 3–8 weeks. Custom tools and automation: varies
-                                by scope. We'll give you a realistic estimate at the consultation stage.</p>
-                        </div>
-                    </div>
-                    <div class="v-faq-item faq-item">
-                        <button class="v-faq-q faq-header">
-                            <span class="v-faq-title faq-title">Will my site work on mobile?</span>
-                            <span class="v-faq-icon faq-toggle">+</span>
-                        </button>
-                        <div class="v-faq-a faq-body">
-                            <p>Every project is fully responsive and mobile-first by default. We test across devices and
-                                screen sizes before any handoff.</p>
-                        </div>
-                    </div>
-                </div>
+        <section class="cta-banner" data-scroll-section>
+            <div data-scroll data-scroll-speed="1">
+                <h2>Need a Solution?</h2>
+                <p>From custom websites to automation tools.</p>
+                <a href="contact.html" class="cta-btn primary" style="margin-top: 20px; display: inline-block;">Get
+                    Started</a>
             </div>
         </section>
 
-        <!-- ===================== CTA BAND ===================== -->
-        <section class="v-cta-band" data-scroll-section>
-            <div class="v-section-label" style="justify-content:center;">Let's Work Together</div>
-            <h2>Ready to build something<br><em>remarkable?</em></h2>
-            <p>Tell us about your project and we'll get back to you within one business day.</p>
-            <div class="v-cta-row-center">
-                <a href="contact.html" class="v-btn-primary">Contact Us Today</a>
-                <a href="about.html" class="v-btn-ghost">View Our Work</a>
-            </div>
-        </section>
-
-        <!-- ===================== FOOTER ===================== -->
-        <footer class="v-footer" data-scroll-section>
-            <div class="v-footer-top">
-                <div class="v-footer-brand">
-                    <span class="logo">Vartistic<span>.</span></span>
-                    <p>We build professional, fast, and SEO-optimized websites with 100% custom code —
-                        no builders, no bloat, just results for your business.</p>
+        <footer data-scroll-section>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Vartistic Studio.</h3>
+                    <p>Fast Code. Real Results.</p>
                 </div>
-                <div class="v-footer-col">
-                    <h4>Pages</h4>
+                <div class="footer-links">
                     <a href="index.html" class="active">Home</a>
-                    <a href="about.html">Our Work</a>
+                    <a href="about.html">About Us</a>
+                    <a href="work.html">Our Work</a>
                     <a href="services.html">Services</a>
                     <a href="team.html">The Squad</a>
                     <a href="contact.html">Contact</a>
                 </div>
-                <div class="v-footer-col">
-                    <h4>Legal</h4>
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="terms.html">Terms & Conditions</a>
-                </div>
-            </div>
-            <div class="v-footer-bottom">
-                <p>&copy; 2026 Vartistic Studio. All Rights Reserved.</p>
-                <div class="v-socials">
+                <div class="footer-socials">
                     <a href="https://www.linkedin.com/company/vartisticstudio/?viewAsMember=true" target="_blank"
                         rel="noopener noreferrer">LinkedIn</a>
                     <a href="https://www.instagram.com/vartisticstudio" target="_blank"
                         rel="noopener noreferrer">Instagram</a>
                 </div>
             </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vartistic Studio. All Rights Reserved.</p>
+            </div>
         </footer>
 
-        <button class="back-to-top">↑</button>
-
-    </div><!-- end #main-container -->
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="script.js"></script>
