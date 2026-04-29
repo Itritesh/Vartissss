@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ========================================================
     async function sendMail(payload) {
         // Production backend (Railway) — used when the site is deployed to Netlify
-        const PROD_ENDPOINT = 'https://vartiss-backend-production.up.railway.app/send-mail';
+        const PROD_ENDPOINT = 'https://vartiss-backend.onrender.com/send-mail';
         const LOCAL_ENDPOINTS = [
             // local dev http server
             'http://localhost:5000/send-mail',
